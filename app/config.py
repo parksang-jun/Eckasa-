@@ -83,6 +83,9 @@ class Settings(BaseSettings):
     # 영상 최대 길이(초). Veo 는 한 번에 8초라 그 이상은 8초 클립을 이어붙인다.
     max_video_seconds: int = 30
     veo_clip_seconds: int = 8  # 클립 1개 길이(이어붙이기 단위)
+
+    # 브랜드 정확 하이브리드: 실제 제품 사진이 메인 + AI 분위기 인트로
+    default_features: str = "방수 완벽\n꼼꼼한 디테일\n데일리로 딱"
     # 기본 프롬프트(스튜디오 프롬프트 입력칸 초기값)
     default_scene_prompt: str = (
         "유럽 파리의 감성적인 거리에서 서양 여성 모델이 이 가방을 어깨에 메고 걷는 "

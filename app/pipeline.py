@@ -219,6 +219,82 @@ def _split_dialogue(text: str, n: int) -> list[str]:
     return out
 
 
+def run_hybrid_job(product_id: int,
+                   scene_desc: str = "",
+                   subtitles_text: str = "",
+                   ai_mode: str = "image",   # none | image | video
+                   dialogue: str = "",
+                   resolution: Optional[str] = None,
+                   publish: bool = False,
+                   job_id: Optional[int] = None) -> dict:
+    """브랜드 정확 하이브리드 광고.
+
+    실제 제품 사진(로고·사이즈 100% 정확)을 메인으로 쓰고, AI는 분위기 인트로로만:
+    - ai_mode=none  : 실제 제품 사진만 (AI 없음, 가장 저렴/정확)
+    - ai_mode=image : AI 라이프스타일 장면 사진 1장 인트로 (저렴, ~$0.04)
+    - ai_mode=video : AI 말하는 영상 인트로 (Veo, 고급/고비용)
+    그 뒤로 실제 제품 사진들을 장점 자막과 함께 보여주고 음악을 입힌다.
+    """
+    product = db.get_product(product_id)
+    if not product:
+        raise ValueError(f"제품 {product_id} 를 찾을 수 없습니다.")
+    real_images = [im for im in product["images"] if im and Path(im).exists()][:5]
+    if not real_images:
+        raise ValueError(f"제품 {product_id} 에 실제 제품 이미지가 없습니다. 크롤링을 먼저 하세요.")
+
+    job_id = job_id or db.create_job(product_id)
+    try:
+        _ckpt(job_id)
+        db.update_job(job_id, status="copy", stage_msg="카피 생성 중")
+        copy = copywriter.generate_copy(product["name"], product.get("price"))
+        caption = _full_caption(copy["caption"], copy.get("hashtags", []))
+        subs = [s.strip() for s in subtitles_text.splitlines() if s.strip()] or copy["subtitles"]
+        db.update_job(job_id, caption=caption,
+                      hashtags=" ".join(copy.get("hashtags", [])),
+                      subtitles_json=json.dumps(subs, ensure_ascii=False))
+
+        # AI 분위기 인트로 (선택)
+        ai_media: list[str] = []
+        if ai_mode in ("image", "video") and settings.scene_image_enabled:
+            _ckpt(job_id)
+            db.update_job(job_id, status="clip", stage_msg="AI 분위기 장면 생성 중")
+            sd = scene_desc or settings.default_scene_prompt
+            imgs = scene.generate_from_prompt(
+                real_images[0], sd, count=1, tag=f"hyb_p{product_id}_j{job_id}")
+            if imgs and ai_mode == "video" and settings.fal_key.strip():
+                _ckpt(job_id)
+                db.update_job(job_id, status="compose", stage_msg="AI 인트로 영상 생성 중(Veo)")
+                clip = veo.generate_talking_clip(
+                    imgs[0], sd, dialogue or settings.default_dialogue,
+                    out_name=f"hyb_{product_id}_{job_id}.mp4",
+                    duration="8s", resolution=resolution)
+                ai_media = [clip] if clip else (imgs[:1])
+            elif imgs:
+                ai_media = imgs[:1]
+
+        # 합성: [AI 인트로] + 실제 제품 사진들 + 실제 제품 마무리컷
+        _ckpt(job_id)
+        db.update_job(job_id, status="compose", stage_msg="릴스 합성 중 (실제 제품이 메인)")
+        scene_media = ai_media + real_images
+        out_path = str(OUTPUT_DIR / f"hybrid_{product_id}_{job_id}.mp4")
+        video_path = composer.compose_scene_reel(
+            scene_media=scene_media, subtitles=subs, out_path=out_path,
+            closing_image=real_images[0], price=product.get("price"))
+        db.update_job(job_id, video_path=video_path)
+
+        if not publish:
+            db.update_job(job_id, status="done", stage_msg="브랜드 정확 광고 생성 완료(게시 안 함)")
+            return {"job_id": job_id, "video_path": video_path, "published": False}
+        _ckpt(job_id)
+        return _publish_video(job_id, product_id, video_path, caption)
+    except JobCancelled:
+        return {"job_id": job_id, "canceled": True}
+    except Exception as e:  # noqa: BLE001
+        db.update_job(job_id, status="error", stage_msg="오류 발생", error=str(e))
+        traceback.print_exc()
+        raise
+
+
 def run_talking_job(product_id: int,
                     scene_desc: str,
                     dialogue: str,

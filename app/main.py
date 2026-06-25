@@ -178,6 +178,7 @@ def studio(request: Request, pid: int, bg: str = "", model: str = ""):
         "default_dialogue": settings.default_dialogue,
         "veo_resolution": settings.veo_resolution,
         "veo_duration": settings.veo_duration,
+        "default_features": settings.default_features,
     })
 
 
@@ -220,6 +221,20 @@ def scene_prompt(pid: int,
                  publish: str = Form("0")):
     """가방 이미지 + 프롬프트 1개 → 자동 릴스 (메인 경로)."""
     _run_bg(pipeline.run_prompt_job, pid, prompt, publish == "1")
+    return RedirectResponse(f"/studio/{pid}", status_code=303)
+
+
+@app.post("/hybrid/{pid}")
+def hybrid_make(pid: int,
+                scene: str = Form(""),
+                subtitles: str = Form(""),
+                ai_mode: str = Form("image"),
+                dialogue: str = Form(""),
+                resolution: str = Form("720p"),
+                publish: str = Form("0")):
+    """브랜드 정확 하이브리드(실제 제품 메인 + AI 분위기) → 백그라운드 실행."""
+    _run_bg(pipeline.run_hybrid_job, pid, scene, subtitles, ai_mode, dialogue,
+            resolution, publish == "1")
     return RedirectResponse(f"/studio/{pid}", status_code=303)
 
 

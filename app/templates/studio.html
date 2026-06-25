@@ -22,6 +22,53 @@
 </div>
 {% endif %}
 
+<!-- 🏆 브랜드 정확 광고 (하이브리드) — 추천 -->
+<div class="mb-6 bg-white rounded-xl shadow-sm border-2 border-emerald-300 p-5">
+  <div class="flex items-center gap-2">
+    <span class="text-base font-bold text-emerald-700">🏆 브랜드 정확 광고 (하이브리드)</span>
+    <span class="text-[11px] bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5">추천 · 로고·사이즈 정확</span>
+  </div>
+  <p class="text-sm text-zinc-600 mt-1">
+    <b>실제 제품 사진</b>이 메인이라 로고·디테일·사이즈가 100% 정확합니다. AI는 분위기 인트로로만 짧게.
+  </p>
+
+  <div class="grid sm:grid-cols-[120px_1fr] gap-4 mt-4 items-start">
+    <div class="aspect-square bg-zinc-100 rounded-lg overflow-hidden">
+      {% if product.thumb %}<img src="{{ product.thumb }}" class="w-full h-full object-cover" alt="{{ product.name }}">{% endif %}
+    </div>
+    <form method="post" action="/hybrid/{{ product.id }}" class="space-y-3">
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-zinc-600">AI 분위기 인트로</label>
+        <select name="ai_mode" class="w-full border border-zinc-300 rounded-lg px-2 py-1.5 text-sm">
+          <option value="image" selected>사진 1컷 (저렴, ~$0.04)</option>
+          <option value="none">없음 (실제 사진만, 무료)</option>
+          <option value="video" {% if not talk_ready %}disabled{% endif %}>말하는 영상 (고급, ~$3)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-zinc-600">AI 인트로 장면 묘사 (분위기)</label>
+        <textarea name="scene" rows="2" class="w-full border border-zinc-300 rounded-lg p-2.5 text-sm">{{ default_scene_prompt }}</textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1 text-zinc-600">장점 자막 (한 줄에 하나씩)</label>
+        <textarea name="subtitles" rows="3" class="w-full border border-zinc-300 rounded-lg p-2.5 text-sm">{{ default_features }}</textarea>
+      </div>
+      <details class="text-xs text-zinc-500">
+        <summary class="cursor-pointer">말하는 영상 인트로일 때 대사</summary>
+        <textarea name="dialogue" rows="2" class="w-full border border-zinc-300 rounded-lg p-2.5 text-sm mt-1">{{ default_dialogue }}</textarea>
+      </details>
+      <div class="flex gap-2">
+        <button name="publish" value="0"
+          class="text-sm bg-emerald-600 text-white rounded-lg px-5 py-2.5 font-semibold hover:bg-emerald-500">🏆 브랜드 정확 광고 생성</button>
+        <button name="publish" value="1"
+          class="text-sm bg-zinc-900 text-white rounded-lg px-4 py-2.5 hover:bg-zinc-700 disabled:opacity-40"
+          {% if not ig_ready %}disabled{% endif %}>생성 + 게시</button>
+      </div>
+      <p class="text-xs text-zinc-400">실제 제품 사진 {{ product.images|length }}장이 메인으로 들어갑니다. (AI 없으면 무료)</p>
+    </form>
+  </div>
+</div>
+
 <!-- 🎬 말하는 시네마틱 영상 (Veo 3.1) -->
 <div class="mb-6 bg-white rounded-xl shadow-sm border-2 border-purple-300 p-5">
   <div class="flex items-center gap-2">
