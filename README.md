@@ -11,6 +11,33 @@ Eckasa(엑카사, `eckasa.com`)의 가방 제품을 자동으로 가져와 **세
 
 ---
 
+## 0. 다른 PC(집 등)에서 이어서 작업하기
+
+이 저장소를 받아 그대로 이어서 쓸 수 있습니다. **단, API 키가 든 `.env` 는 보안상 GitHub에
+올라가지 않으므로, 새 PC에서 다시 만들어야 합니다.**
+
+```powershell
+# 1) 코드 받기
+git clone https://github.com/parksang-jun/Eckasa-.git
+cd Eckasa-
+
+# 2) 파이썬 가상환경 + 의존성
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# 3) 환경설정 파일 만들기 → 키 입력 (fal.ai, 비밀번호 등)
+copy .env.example .env
+#   .env 를 메모장으로 열어 FAL_KEY, APP_PASSWORD 등 채우기
+
+# 4) ffmpeg 설치 (아래 1번 참고) / 공개링크 쓰려면 cloudflared 받기
+# 5) 실행
+python run.py
+```
+
+- `tools/`(ffmpeg·cloudflared)와 `.env`, `data/`, `output/` 는 저장소에 없습니다(각 PC에서 생성).
+- 작업 후 변경사항 저장: `git add -A && git commit -m "메모" && git push`
+
 ## 1. 빠르게 시작하기
 
 ### (1) 사전 설치
