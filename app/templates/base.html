@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}ECKASA 릴스 광고 자동화{% endblock %}</title>
+
+  <!-- PWA: 아이폰/PC 홈화면 앱 설치 -->
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <meta name="theme-color" content="#18181b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ECKASA">
+  <link rel="apple-touch-icon" href="/static/icons/icon-180.png">
+  <link rel="icon" type="image/png" href="/static/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, "Malgun Gothic", sans-serif; }
+  </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900">
+  <header class="bg-zinc-900 text-white">
+    <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-bold tracking-tight">ECKASA <span class="text-pink-400">Reels</span></a>
+      <nav class="flex gap-5 text-sm">
+        <a href="/" class="hover:text-pink-400">제품</a>
+        <a href="/jobs" class="hover:text-pink-400">작업 현황</a>
+        <a href="/posts" class="hover:text-pink-400">게시 이력</a>
+      </nav>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-5 py-6">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="max-w-6xl mx-auto px-5 py-8 text-xs text-zinc-400">
+    ECKASA 가방 → AI 릴스 광고 자동 제작·게시
+  </footer>
+</body>
+</html>

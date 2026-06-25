@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}게시 이력 · ECKASA Reels{% endblock %}
+{% block content %}
+
+<h2 class="text-lg font-bold mb-3">인스타그램 게시 이력</h2>
+
+{% if posts|length == 0 %}
+  <div class="text-zinc-500 text-sm bg-white border border-zinc-100 rounded-xl p-8 text-center">
+    아직 게시된 릴스가 없습니다.
+  </div>
+{% else %}
+<div class="bg-white rounded-xl shadow-sm border border-zinc-100 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-zinc-50 text-zinc-500 text-xs">
+      <tr>
+        <th class="text-left px-4 py-2">제품</th>
+        <th class="text-left px-4 py-2">미디어 ID</th>
+        <th class="text-left px-4 py-2">링크</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for po in posts %}
+      <tr class="border-t border-zinc-100">
+        <td class="px-4 py-2">{{ po.product_name or po.product_id }}</td>
+        <td class="px-4 py-2 text-zinc-500 text-xs">{{ po.ig_media_id }}</td>
+        <td class="px-4 py-2">
+          {% if po.permalink %}
+            <a href="{{ po.permalink }}" target="_blank" class="text-pink-600 hover:underline">릴스 보기 ↗</a>
+          {% else %}<span class="text-zinc-400">-</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

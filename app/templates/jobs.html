@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}작업 현황 · ECKASA Reels{% endblock %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-3">
+  <h2 class="text-lg font-bold">작업 현황</h2>
+  <button onclick="location.reload()" class="text-sm bg-zinc-200 rounded-lg px-3 py-1.5 hover:bg-zinc-300">새로고침</button>
+</div>
+<p class="text-xs text-zinc-400 mb-4">진행 중인 작업은 자동으로 끝나며, 이 페이지를 새로고침하면 최신 상태가 보입니다.</p>
+
+{% set status_kr = {
+  'pending':'대기', 'copy':'카피 생성', 'clip':'AI 클립', 'compose':'영상 합성',
+  'upload':'업로드', 'publish':'게시 중', 'done':'완료', 'error':'오류', 'canceled':'취소됨'
+} %}
+
+{% if jobs|length == 0 %}
+  <div class="text-zinc-500 text-sm bg-white border border-zinc-100 rounded-xl p-8 text-center">
+    아직 작업이 없습니다. 제품 페이지에서 <b>영상 생성</b> 또는 <b>생성+게시</b>를 눌러보세요.
+  </div>
+{% else %}
+<div class="space-y-3">
+  {% for j in jobs %}
+  <div class="bg-white rounded-xl shadow-sm border border-zinc-100 p-4">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <div class="font-semibold text-sm">#{{ j.id }} · {{ j.product_name or j.product_id }}</div>
+        <div class="text-xs mt-0.5">
+          상태:
+          {% if j.status == 'done' %}<span class="text-green-600 font-semibold">{{ status_kr.get(j.status, j.status) }}</span>
+          {% elif j.status == 'error' %}<span class="text-red-500 font-semibold">{{ status_kr.get(j.status, j.status) }}</span>
+          {% else %}<span class="text-pink-600 font-semibold">{{ status_kr.get(j.status, j.status) }}</span>{% endif %}
+          {% if j.stage_msg %}<span class="text-zinc-400">· {{ j.stage_msg }}</span>{% endif %}
+        </div>
+        {% if j.error %}<div class="text-xs text-red-500 mt-1 break-all">{{ j.error }}</div>{% endif %}
+        {% if j.caption %}<div class="text-xs text-zinc-500 mt-2 whitespace-pre-line line-clamp-3">{{ j.caption }}</div>{% endif %}
+      </div>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        {% if j.video_url %}
+        <video src="{{ j.video_url }}" controls class="w-28 rounded-lg bg-black"></video>
+        {% endif %}
+        {% if j.active %}
+        <form method="post" action="/jobs/{{ j.id }}/cancel">
+          <input type="hidden" name="redirect" value="/jobs">
+          <button class="text-xs bg-red-50 text-red-600 border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-100">작업 취소</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

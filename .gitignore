@@ -1,0 +1,31 @@
+# 비밀 / 환경 (절대 커밋 금지!)
+.env
+.env.*
+!.env.example
+
+# 데이터 / 산출물
+data/
+output/
+assets/music/*
+!assets/music/README.txt
+
+# 대용량 바이너리 (집 PC에서 재설치/재다운로드) — README 참고
+tools/
+
+# 로그 / 임시
+*.log
+_make_*.py
+*.db
+
+# 파이썬
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Claude Code 로컬 설정
+.claude/

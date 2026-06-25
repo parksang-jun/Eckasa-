@@ -1,0 +1,32 @@
+# --- 웹 / 서버 ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+jinja2==3.1.5
+python-multipart==0.0.20
+
+# --- 크롤링 ---
+httpx==0.28.1
+beautifulsoup4==4.12.3
+lxml==5.3.0
+truststore==0.10.1      # 사내망/보안프록시(자체서명 인증서) 환경에서 OS 인증서 저장소 사용
+
+# --- 설정 ---
+python-dotenv==1.0.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# --- AI / 카피 ---
+anthropic==0.42.0
+fal-client==0.5.6
+google-genai==1.20.0    # 무료 경로: Google AI Studio(Gemini) 이미지 생성
+
+# --- 스토리지 (공개 영상 호스팅) ---
+boto3==1.35.92          # Cloudflare R2 / AWS S3 (S3 호환 API)
+
+# --- 스케줄러 ---
+apscheduler==3.11.0
+
+# --- 이미지 처리 (커버 이미지 등) ---
+pillow==11.1.0
+
+# 참고: ffmpeg / ffprobe 는 pip 패키지가 아니라 시스템에 별도 설치해야 합니다 (README 참고).
