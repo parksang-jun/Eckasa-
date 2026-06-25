@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>특허 분석 결과 — {{ r.paper_name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>특허 분석 결과</h1>
+      <p class="subtitle">원문: {{ r.paper_name }}</p>
+      <div class="actions">
+        <a class="btn primary" href="/download/{{ r.result_id }}">📄 PDF 다운로드</a>
+        <a class="btn" href="/">← 다른 논문 분석</a>
+      </div>
+    </header>
+
+    {% for w in r.warnings %}<div class="alert warn">{{ w }}</div>{% endfor %}
+
+    <!-- 1. 특허 가능성 -->
+    <section class="card">
+      <h2>1. 특허 가능성 분석</h2>
+      <p class="verdict">종합 판정: <strong>{{ r.analysis.verdict }}</strong></p>
+      <p><b>제안 발명의 명칭:</b> {{ r.analysis.title_suggestion }}</p>
+      <h3>핵심 구성요소</h3>
+      <ul>{% for f in r.analysis.core_features %}<li>{{ f }}</li>{% endfor %}</ul>
+      <h3>신규성</h3><p>{{ r.analysis.novelty }}</p>
+      <h3>진보성</h3><p>{{ r.analysis.inventive_step }}</p>
+      <h3>산업상 이용가능성</h3><p>{{ r.analysis.industrial_applicability }}</p>
+      <h3>판단 근거</h3>
+      <ul>{% for x in r.analysis.reasons %}<li>{{ x }}</li>{% endfor %}</ul>
+    </section>
+
+    <!-- 2. 선행특허 -->
+    <section class="card">
+      <h2>2. 선행특허(중복) 검색</h2>
+      <p class="muted">검색 키워드: {{ r.search.queried_keywords | join(', ') }}</p>
+      {% if r.search.note %}<div class="alert info">{{ r.search.note }}</div>{% endif %}
+      {% for p in r.search.patents %}
+      <div class="patent">
+        <div class="ptitle">[{{ loop.index }}] {{ p.title }}</div>
+        <div class="muted">출원번호 {{ p.app_no }} · 출원인 {{ p.applicant }}
+          · 상태 {{ p.status }} · 출원일 {{ p.app_date }}</div>
+        {% if p.abstract %}<p class="abs">{{ p.abstract }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </section>
+
+    <!-- 3. 중복 비교/보완 -->
+    <section class="card">
+      <h2>3. 중복 비교 및 회피·보완 가이드</h2>
+      <p>{{ r.diff.overall }}</p>
+      {% for c in r.diff.comparisons %}
+      <div class="cmp">
+        <div class="cmp-head">
+          <span class="ptitle">{{ c.patent_title }}</span>
+          <span class="badge lvl-{{ c.overlap_level }}">중복도 {{ c.overlap_level }}</span>
+        </div>
+        <div class="muted">출원번호 {{ c.app_no }}</div>
+        {% if c.overlapping_points %}<b>겹치는 점</b>
+          <ul>{% for x in c.overlapping_points %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}
+        {% if c.differentiators %}<b>차별점</b>
+          <ul>{% for x in c.differentiators %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}
+        {% if c.amendment_advice %}<b>청구항 보완 방향</b>
+          <ul>{% for x in c.amendment_advice %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      {% endfor %}
+      {% if r.diff.strategy %}
+      <h3>종합 전략</h3>
+      <ul>{% for s in r.diff.strategy %}<li>{{ s }}</li>{% endfor %}</ul>
+      {% endif %}
+    </section>
+
+    <!-- 4. 명세서 초안 -->
+    <section class="card spec">
+      <h2>4. 특허 명세서 초안</h2>
+      <p><b>【발명의 명칭】</b> {{ r.spec.invention_title }}</p>
+      <h3>【기술분야】</h3><p>{{ r.spec.technical_field }}</p>
+      <h3>【배경기술】</h3><p>{{ r.spec.background_art }}</p>
+      <h3>【발명이 해결하려는 과제】</h3><p>{{ r.spec.problem }}</p>
+      <h3>【과제의 해결 수단】</h3><p>{{ r.spec.solution }}</p>
+      <h3>【발명의 효과】</h3><p>{{ r.spec.effects }}</p>
+      <h3>【청구범위】</h3>
+      <ol class="claims">{% for c in r.spec.claims %}<li>{{ c }}</li>{% endfor %}</ol>
+      <h3>【요약】</h3><p>{{ r.spec.abstract }}</p>
+    </section>
+
+    <p class="disclaimer">※ 본 결과는 AI가 생성한 초안입니다. 실제 출원 전 반드시 변리사 검토를 받으세요.</p>
+  </main>
+</body>
+</html>
