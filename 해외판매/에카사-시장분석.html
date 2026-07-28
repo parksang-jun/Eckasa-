@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에카사 해외시장 분석</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --ink:#1d2433; --sub:#6b7280; --line:#e5e8f0;
+    --brand:#31456e; --brand2:#43598a; --accent:#e9edf6; --danger:#c0392b; --warn:#b7791f; --ok:#2e7d32;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background:var(--bg); color:var(--ink); font-size:14px;}
+  header{background:var(--brand); color:#fff; padding:14px 24px;}
+  header h1{font-size:19px;}
+  header .sub{font-size:12px; opacity:.85;}
+  nav{background:#fff; border-bottom:1px solid var(--line); padding:0 12px; display:flex; flex-wrap:wrap; position:sticky; top:0; z-index:50;}
+  nav button{border:none; background:none; padding:13px 15px; font-size:14px; cursor:pointer; color:var(--sub); border-bottom:3px solid transparent; font-family:inherit;}
+  nav button.active{color:var(--brand); border-bottom-color:var(--brand); font-weight:bold;}
+  nav button:hover{color:var(--brand);}
+  main{padding:20px; max-width:1200px; margin:0 auto;}
+  .tab{display:none;} .tab.active{display:block;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px;}
+  .card h2{font-size:16px; margin-bottom:12px; color:var(--brand);}
+  .card h3{font-size:14px; margin:14px 0 8px; color:var(--brand);}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{background:var(--accent); text-align:left; padding:8px 10px; font-size:12px; color:var(--brand); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:hover td{background:#fafbfd;}
+  .btn{display:inline-block; border:none; border-radius:6px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit; background:var(--brand); color:#fff;}
+  .btn:hover{background:var(--brand2);}
+  .btn.sm{padding:4px 9px; font-size:12px;}
+  .btn.ghost{background:#fff; color:var(--brand); border:1px solid var(--brand);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  input,select,textarea{border:1px solid #cfd6e0; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; width:100%;}
+  label{display:block; font-size:12px; color:var(--sub); margin-bottom:4px;}
+  .frow{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:12px;}
+  .badge{display:inline-block; padding:2px 9px; border-radius:99px; font-size:11px; font-weight:bold; white-space:nowrap;}
+  .r-low{background:#e3f2e5; color:var(--ok);} .r-mid{background:#fdf3dd; color:var(--warn);} .r-high{background:#fbe4e0; color:var(--danger);}
+  .muted{color:var(--sub); font-size:12px;}
+  .right{text-align:right;}
+  .grid{display:grid; gap:14px;}
+  .grid.c2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));}
+  .rank{font-size:18px; font-weight:bold;}
+  .scorebar{background:#eef0f4; border-radius:99px; height:10px; overflow:hidden;}
+  .scorebar>div{height:100%; background:linear-gradient(90deg,#43598a,#6d84b8); border-radius:99px;}
+  .result-box{background:var(--accent); border-radius:10px; padding:16px; margin-top:12px;}
+  .big{font-size:24px; font-weight:bold; color:var(--brand);}
+  .notice{background:#fdf3dd; border:1px solid #f0dfae; color:#7a5b12; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px;}
+  .flag{font-size:20px;}
+  .kv{display:grid; grid-template-columns:110px 1fr; gap:4px 10px; font-size:13px; line-height:1.6;}
+  .kv b{color:var(--brand);}
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(20,26,40,.5); z-index:100; overflow:auto; padding:30px 12px;}
+  .modal-bg.open{display:block;}
+  .modal{background:#fff; border-radius:12px; max-width:860px; margin:0 auto; padding:24px;}
+  .modal h2{color:var(--brand); font-size:17px; margin-bottom:12px;}
+  .ai-report{white-space:pre-wrap; line-height:1.7; font-size:13.5px; max-height:60vh; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:16px; background:#fafbfd;}
+  .spin{display:inline-block; width:14px; height:14px; border:2px solid #cbd5e0; border-top-color:var(--brand); border-radius:50%; animation:sp .8s linear infinite; vertical-align:-2px;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  @media(max-width:700px){ main{padding:10px;} .kv{grid-template-columns:90px 1fr;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ECKASA 해외시장 정밀 분석</h1>
+  <div class="sub">보냉백·토트백·파우치 브랜드의 국가별 진출 전략 — 적정가격 · 결제 · 배송 · 리스크</div>
+</header>
+
+<nav id="nav">
+  <button data-tab="rank" class="active">🏆 시장 매력도 순위</button>
+  <button data-tab="price">💰 적정가격 계산기</button>
+  <button data-tab="country">🌍 국가별 상세 분석</button>
+  <button data-tab="pay">💳 결제방식 비교</button>
+  <button data-tab="shipx">🚚 배송방식 비교</button>
+  <button data-tab="risk">⚠️ 리스크 비교</button>
+</nav>
+
+<main>
+
+<!-- ===== 순위 ===== -->
+<div class="tab active" id="tab-rank">
+  <div class="notice">이 분석은 에카사의 실제 제품군(보냉백 ₩38,000~53,000 · 토트백 · 파우치 ₩5,000~45,000)을 기준으로, 시장 규모 · 가격 수용성 · 물류 · 결제 · 리스크 5개 항목을 5점 만점으로 평가한 결과입니다. 수치(환율·배송비·수수료·관세)는 추정치이므로 실제 진출 전 각 기관 공식 페이지에서 확인하세요.</div>
+  <div class="card">
+    <h2>국가별 종합 매력도 순위 (에카사 제품 기준)</h2>
+    <table>
+      <thead><tr><th>순위</th><th>국가</th><th class="right">시장규모</th><th class="right">가격수용성</th><th class="right">물류</th><th class="right">결제</th><th class="right">리스크안전</th><th style="width:180px;">종합</th><th></th></tr></thead>
+      <tbody id="rankRows"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>핵심 요약 — 어디부터 시작할까?</h2>
+    <div class="kv" style="grid-template-columns:80px 1fr;">
+      <b>1단계</b><span><b>일본</b> — 지리적으로 가깝고 배송이 빠르며(EMS 2~4일), K-라이프스타일 브랜드 선호도가 가장 높습니다. Qoo10 재팬으로 시작하면 초기 비용이 가장 낮습니다.</span>
+      <b>2단계</b><span><b>대만 · 싱가포르</b> — Shopee 하나로 두 시장 모두 진입 가능. 한국 브랜드 수용도가 높고 통관 리스크가 낮습니다.</span>
+      <b>3단계</b><span><b>미국 · 호주</b> — 시장은 크지만(특히 피크닉·아웃도어 문화로 보냉백 수요 큼) 배송비와 관세 리스크가 커서, 1~2단계에서 물류 경험을 쌓은 뒤 진입을 권장합니다. 미국은 2025년 소액면세(de minimis) 폐지로 관세 확인이 필수입니다.</span>
+      <b>주의</b><span><b>중국</b>은 플랫폼 진입장벽(보증금·인증)이 높고, <b>유럽(독일·프랑스·영국)</b>은 VAT·포장재법 등 등록 의무가 있어 준비 없이 진입하면 리스크가 큽니다.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 가격 계산기 ===== -->
+<div class="tab" id="tab-price">
+  <div class="card">
+    <h2>💰 국가별 적정 판매가격 계산기</h2>
+    <p class="muted" style="margin-bottom:12px;">제품·국가·배송방식·마진을 선택하면 수수료와 배송비를 반영한 <b>권장 판매가</b>를 현지 통화로 계산하고, 현지 시장 가격대와 비교해 드립니다.</p>
+    <div class="frow">
+      <div><label>제품</label><select id="pcProduct"></select></div>
+      <div><label>판매 국가</label><select id="pcCountry"></select></div>
+      <div><label>배송 방식</label><select id="pcShip"></select></div>
+      <div><label>마켓 수수료(%)</label><input type="number" id="pcFee" step="0.1"></div>
+      <div><label>결제 수수료(%)</label><input type="number" id="pcPayFee" step="0.1" value="3"></div>
+      <div><label>목표 마진(%)</label><input type="number" id="pcMargin" step="1" value="20"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:200px 200px 1fr;">
+      <div><label>제품 원가/공급가 (₩) — 비우면 국내판매가의 50% 적용</label><input type="number" id="pcCost" placeholder="자동"></div>
+      <div><label>환율 (₩ per 1 <span id="pcCurLabel">USD</span>)</label><input type="number" id="pcFx" step="0.001"></div>
+      <div style="align-self:end;"><button class="btn" onclick="calcPrice()">계산하기</button></div>
+    </div>
+    <div id="pcResult"></div>
+  </div>
+</div>
+
+<!-- ===== 국가별 상세 ===== -->
+<div class="tab" id="tab-country">
+  <div class="card">
+    <div style="display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-bottom:14px;">
+      <div style="min-width:220px;"><label>국가 선택</label><select id="ctSelect" onchange="renderCountryDetail()"></select></div>
+      <button class="btn ghost" onclick="aiDeepDive()" id="aiBtn">🤖 AI 심층 분석 리포트 생성</button>
+    </div>
+    <div id="ctDetail"></div>
+  </div>
+</div>
+
+<!-- ===== 결제 비교 ===== -->
+<div class="tab" id="tab-pay">
+  <div class="card">
+    <h2>💳 국가별 결제 가능 방식 분석</h2>
+    <p class="muted" style="margin-bottom:12px;">각 나라 고객이 실제로 쓰는 결제수단입니다. 마켓플레이스(아마존·Shopee 등)에 입점하면 결제는 플랫폼이 대행하므로 별도 준비가 필요 없고, <b>자사몰로 직접 판매할 때</b>는 아래 수단을 지원하는 결제대행(PG)을 연결해야 합니다.</p>
+    <table>
+      <thead><tr><th>국가</th><th>주요 결제수단 (이용 비중 순)</th><th>자사몰 판매 시 권장 PG</th><th>참고</th></tr></thead>
+      <tbody id="payRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 배송 비교 ===== -->
+<div class="tab" id="tab-shipx">
+  <div class="card">
+    <h2>🚚 국가별 최적 배송방식 분석</h2>
+    <p class="muted" style="margin-bottom:12px;">에카사 제품은 대부분 500g 이하 경량이라 <b>K-Packet(2kg 이하 소형포장물)</b>이 비용상 가장 유리하고, 고가 상품·빠른 배송이 필요하면 EMS 또는 특송(DHL/FedEx)을 쓰는 이원화 전략이 좋습니다. 아래 요금은 <b>0.5kg 기준 추정치</b>이며 실제 요금은 <a href="https://ems.epost.go.kr" target="_blank">우체국 EMS</a> 요금표를 확인하세요.</p>
+    <table>
+      <thead><tr><th>국가</th><th class="right">K-Packet<br>(0.5kg)</th><th class="right">EMS<br>(0.5kg)</th><th class="right">특송 DHL/FedEx<br>(0.5kg)</th><th>소요일</th><th>추천 방식</th></tr></thead>
+      <tbody id="shipRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 리스크 비교 ===== -->
+<div class="tab" id="tab-risk">
+  <div class="card">
+    <h2>⚠️ 국가별 판매 리스크 분석</h2>
+    <p class="muted" style="margin-bottom:12px;">통관·세금, 규제, 반품, 시장 리스크를 국가별로 정리했습니다. <span class="badge r-high">상</span> 항목은 진출 전 반드시 대비하세요.</p>
+    <div id="riskCards"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- AI 리포트 모달 -->
+<div class="modal-bg" id="aiModalBg">
+  <div class="modal">
+    <h2 id="aiModalTitle">AI 심층 분석</h2>
+    <div class="ai-report" id="aiReport"></div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+      <button class="btn ghost" onclick="copyReport()">복사</button>
+      <button class="btn" onclick="document.getElementById('aiModalBg').classList.remove('open')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   에카사 해외시장 분석 — 국가별 데이터 (2026년 중반 기준 추정치)
+   ============================================================ */
+
+const PRODUCTS = [
+  {name:"싱글 보냉백", price:41000, weight:350},
+  {name:"데일리 보틀백(보냉백)", price:38000, weight:250},
+  {name:"스팽글 토트백", price:41000, weight:300},
+  {name:"에카사 트래블 파우치", price:19000, weight:120},
+  {name:"컬러 파우치", price:15000, weight:80},
+  {name:"스트랩 파우치", price:19000, weight:100},
+  {name:"스퀘어 보냉백", price:45000, weight:400},
+  {name:"원형 보냉백", price:45000, weight:380},
+  {name:"토바 보냉백", price:53000, weight:450},
+  {name:"모노백", price:41000, weight:320},
+  {name:"토바백", price:33000, weight:300},
+  {name:"노트북 파우치 16인치", price:39000, weight:350},
+  {name:"피크닉 매트", price:29000, weight:500},
+  {name:"플레이 스트랩", price:5000, weight:50},
+];
+
+// score: [시장규모, 가격수용성, 물류, 결제, 리스크안전] 각 5점 만점
+const DATA = [
+{
+  code:"JP", name:"일본", flag:"🇯🇵", currency:"JPY", fx:9.3,
+  score:[4.5,4.5,5,4.5,4.5],
+  summary:"에카사 최우선 추천 시장. K-라이프스타일 붐, 빠른 배송(2~4일), 낮은 통관 리스크. 귀엽고 실용적인 보냉백·파우치 감성이 일본 소비자 취향과 정확히 일치.",
+  priceRange:"보냉백(保冷バッグ) ¥2,000~6,000 / 토트백 ¥2,500~8,000 / 파우치 ¥1,000~3,000. 한국 브랜드 프리미엄 +10~20% 수용 가능.",
+  markets:[["Qoo10 Japan","약 10%","한국 셀러 진입 최다. 메가와리 세일 활용"],["Amazon Japan","8~15%","FBA 이용 시 물류 위탁 가능"],["Rakuten","8~12%+월고정비","현지 법인/대행 필요한 경우 있음"],["BASE/STORES","3~6%","자사몰형, 소규모 시작에 적합"]],
+  payments:[["신용카드","~70% — 가장 보편적"],["편의점 결제(コンビニ払い)","약 10~15% — 일본 특유, 젊은층·주부"],["코드결제(PayPay 등)","급성장 중"],["대금상환(代引き)","소폭 유지"]],
+  shipping:{kpacket:10000, ems:22000, express:40000, days:"K-Packet 4~8일 / EMS 2~4일 / 특송 1~3일", rec:"K-Packet 기본 + 고가상품 EMS. 가장 물류가 쉬운 시장."},
+  customs:"과세가격(물품가의 60%) 1만엔 이하 면세 → 소매가 약 16,666엔 이하 개인구매는 대부분 면세. 초과 시 관세+소비세 10%.",
+  risks:[["통관·세금","하","1만엔 기준 면세 폭이 커서 에카사 가격대는 대부분 면세 통관"],["규제·인증","하","일반 잡화(가방)는 별도 인증 불요"],["반품","하","반품 문화 온건, 반품률 낮음"],["시장 경쟁","중","보냉백 현지 브랜드(서모스 등) 많음 — 디자인 차별화 필요"],["언어","중","상품페이지 일본어 현지화 필수 (자동 번역 기능 활용)"]],
+},
+{
+  code:"US", name:"미국", flag:"🇺🇸", currency:"USD", fx:1380,
+  score:[5,4.5,3.5,5,2.5],
+  summary:"세계 최대 시장 + 런치백·쿨러백 수요 매우 큼. 다만 2025년 소액수입 면세(de minimis $800) 폐지로 전 수입품이 관세 대상이 되어, 관세·배송비 관리가 성패를 좌우.",
+  priceRange:"런치백/쿨러백 $15~45 (Amazon 기준 볼륨존 $20~35) / 토트백 $20~60 / 파우치 $10~25. 디자인 프리미엄 브랜드는 $40~80도 형성.",
+  markets:[["Amazon US","~15%","FBA 필수적. 리뷰 확보가 관건"],["Etsy","~9.5%(결제수수료 포함)","핸드메이드·디자인 소품에 유리, 진입 쉬움"],["eBay","~13.6%",""],["TikTok Shop US","~8%","영상 콘텐츠로 급성장 채널"]],
+  payments:[["신용카드(Visa/Master/Amex)","주류"],["PayPal","온라인 구매자 다수 보유"],["Apple Pay / Google Pay","모바일 결제 급증"],["BNPL(Affirm/Klarna)","젊은층 증가"]],
+  shipping:{kpacket:14000, ems:29000, express:45000, days:"K-Packet 7~15일 / EMS 3~7일 / 특송 2~4일", rec:"저가 상품 K-Packet, $40+ 상품은 EMS/특송. 무료배송 기대심리가 강해 배송비를 판매가에 포함하는 전략 필요."},
+  customs:"⚠️ 2025년 8월부로 $800 소액면세(de minimis) 폐지 — 모든 수입품이 관세 부과 대상. 섬유제 가방류 기본관세율이 높은 편(품목별 상이). 한미 FTA 원산지증명 시 절감 가능. 관세 정책이 자주 바뀌므로 발송 전 최신 규정 확인 필수.",
+  risks:[["통관·세금","상","de minimis 폐지로 소액 주문도 관세·통관수수료 발생 → 고객 불만/수취거부 리스크"],["시장 경쟁","상","아마존 내 중국 셀러와 가격 경쟁 심함 — 가격이 아닌 디자인·브랜드로 승부"],["반품","중","반품 관대 문화. 반품 시 국제 반송비가 커서 '환불 후 폐기' 정책 고려"],["제조물책임(PL)","중","보냉백 식품 접촉 관련 클레임 대비, PL보험 검토"],["환율","중","원/달러 변동성 — 분기별 가격 재점검"]],
+},
+{
+  code:"TW", name:"대만", flag:"🇹🇼", currency:"TWD", fx:43,
+  score:[3.5,4,4.5,4,4.5],
+  summary:"한국 브랜드 선호도가 매우 높고 Shopee로 쉽게 진입 가능. 시장 규모는 중간이지만 진입 비용·리스크가 낮아 '두 번째 시장'으로 최적.",
+  priceRange:"보냉백 NT$500~1,400 / 토트백 NT$600~1,800 / 파우치 NT$250~700.",
+  markets:[["Shopee Taiwan","6~8%","한국 셀러 전용 프로그램 있음"],["PChome","~10%",""],["momo","~10~15%","현지 대행 통한 입점"]],
+  payments:[["신용카드","주류"],["편의점 결제/수령","대만 특유 — 세븐일레븐 수령 인기"],["LINE Pay","보편적"],["ATM 이체","일부"]],
+  shipping:{kpacket:9000, ems:14000, express:35000, days:"K-Packet 5~9일 / EMS 2~4일 / 특송 1~3일", rec:"Shopee 공식 물류(SLS) 이용 시 배송·통관이 간단. 개별 발송은 K-Packet."},
+  customs:"NT$2,000 이하 면세 (단, 반기 6회 초과 시 과세). 에카사 가격대 대부분 면세 범위.",
+  risks:[["통관·세금","하","면세 한도 넉넉, 통관 간단"],["시장 경쟁","중","한국·일본 브랜드 다수 진출"],["반품","하","Shopee 정책 준수 시 무난"],["규제","하","일반 잡화 인증 불요"]],
+},
+{
+  code:"SG", name:"싱가포르", flag:"🇸🇬", currency:"SGD", fx:1030,
+  score:[3,4.5,4,4.5,4.5],
+  summary:"구매력 최상위, 영어 사용으로 운영 쉬움, 통관 투명. 시장이 작다는 것이 유일한 단점 — 동남아 진출의 테스트베드로 활용.",
+  priceRange:"보냉백 S$20~55 / 토트백 S$25~70 / 파우치 S$10~30. 프리미엄 가격 수용도 높음.",
+  markets:[["Shopee SG","5~8%",""],["Lazada SG","5~8%","알리바바 계열"],["Amazon SG","~15%",""]],
+  payments:[["신용카드","주류"],["PayNow","계좌 실시간이체 보편화"],["GrabPay","동남아 슈퍼앱"],["Atome(BNPL)","증가"]],
+  shipping:{kpacket:11000, ems:18000, express:38000, days:"K-Packet 5~10일 / EMS 3~5일 / 특송 2~3일", rec:"K-Packet 기본. 시장이 작아 물량 적을 때 EMS 혼용."},
+  customs:"관세는 사실상 없음(주류 등 제외). GST 9%가 저가 수입품에도 부과(2023~) — 플랫폼 판매 시 플랫폼이 징수 대행.",
+  risks:[["통관·세금","하","투명하고 간단"],["시장 규모","중","인구 600만 — 절대 규모 작음"],["경쟁","중","글로벌 브랜드 집결지"]],
+},
+{
+  code:"AU", name:"호주", flag:"🇦🇺", currency:"AUD", fx:900,
+  score:[3.5,4.5,3.5,4.5,4],
+  summary:"피크닉·바비큐·아웃도어 문화로 보냉백(cooler bag) 수요가 구조적으로 큰 시장. 에카사 제품 적합도가 가장 높은 나라 중 하나. 거리로 인한 배송비가 관건.",
+  priceRange:"쿨러백 A$25~70 / 토트백 A$30~80 / 피크닉매트 A$30~60. 가격 수용도 높음.",
+  markets:[["Amazon AU","~15%","성장 중"],["eBay AU","~13%","호주 전통 강자"],["Etsy","~9.5%","디자인 소품"]],
+  payments:[["신용카드","주류"],["PayPal","보편적"],["Afterpay(BNPL)","호주 발상 — 매우 인기"],["Apple/Google Pay","증가"]],
+  shipping:{kpacket:13000, ems:26000, express:42000, days:"K-Packet 7~14일 / EMS 4~8일 / 특송 2~4일", rec:"K-Packet 기본 + 대형 상품(피크닉매트) EMS. 배송비를 가격에 포함한 '무료배송' 표기 권장."},
+  customs:"A$1,000 이하 관세 면제. GST 10%는 플랫폼이 징수 대행(저가 수입품 포함). 통관 무난.",
+  risks:[["통관·세금","하","A$1,000 면세 — 에카사 전 제품 해당"],["검역","중","식품·목재 검역이 엄격한 나라 — 가방은 무관하나 포장재(짚·나무) 사용 금지"],["배송기간","중","기대 배송기간이 길어 이탈 위험 — 추적번호 필수 제공"],["경쟁","중","현지 브랜드(KeepCool 등) 존재"]],
+},
+{
+  code:"VN", name:"베트남", flag:"🇻🇳", currency:"VND", fx:0.054,
+  score:[3.5,2.5,3.5,3,3],
+  summary:"한류 영향력 최상, 시장 성장률 높음. 다만 가격 민감도가 매우 높아 에카사 중고가 라인은 하노이·호치민 중산층 타깃으로 좁혀야 함. COD 문화 대비 필수.",
+  priceRange:"보냉백 15만~40만동(약 ₩8,000~22,000) 볼륨존 — 에카사 정가가 현지 시세보다 높음 → 파우치·스트랩 등 저가 라인 우선 진입 권장.",
+  markets:[["Shopee VN","5~10%","최대 플랫폼"],["TikTok Shop VN","~5%","라이브커머스 급성장"],["Lazada VN","5~10%",""]],
+  payments:[["COD(착불 현금)","여전히 50~60% — 필수 지원"],["MoMo/ZaloPay","전자지갑 급성장"],["은행이체","보편적"],["신용카드","보급률 낮음"]],
+  shipping:{kpacket:9000, ems:13000, express:35000, days:"K-Packet 6~12일 / EMS 3~6일 / 특송 2~4일", rec:"플랫폼 공식 물류(Shopee SLS) 강력 권장 — COD 수금까지 대행."},
+  customs:"2025년부터 저가 수입품 부가세 면제 폐지 — 소액도 VAT 부과. 통관 지연이 잦은 편.",
+  risks:[["COD 미수취","상","착불 주문 후 수취 거부 비율 높음 — 플랫폼 물류로 방어"],["가격 민감","상","정가 그대로는 판매 어려움 — 라인 선별 필요"],["통관","중","지연·비공식 비용 발생 사례"],["위조품","중","인기 상승 시 카피 제품 등장 주의"]],
+},
+{
+  code:"TH", name:"태국", flag:"🇹🇭", currency:"THB", fx:39,
+  score:[3.5,3,3.5,3.5,3.5],
+  summary:"K-컬처 수용도 높고 이커머스 성장 중. 더운 기후로 보냉백 실수요 존재. 중저가 라인부터 진입 권장.",
+  priceRange:"보냉백 ฿300~1,000 / 토트백 ฿400~1,500 / 파우치 ฿150~500.",
+  markets:[["Shopee TH","5~10%",""],["Lazada TH","5~10%",""],["TikTok Shop TH","~5%","라이브커머스 강세"]],
+  payments:[["PromptPay(QR이체)","국민 결제수단"],["COD","여전히 30~40%"],["신용카드","방콕 중심"],["TrueMoney","전자지갑"]],
+  shipping:{kpacket:9500, ems:15000, express:35000, days:"K-Packet 6~12일 / EMS 3~6일 / 특송 2~4일", rec:"플랫폼 공식 물류 권장. 개별 발송은 K-Packet."},
+  customs:"2024년부터 저가 수입품에도 VAT 7% 부과. 1,500밧 이하 관세 면제는 유지되나 정책 변동 잦음.",
+  risks:[["가격 민감","중","중국산 저가와 경쟁"],["COD 미수취","중","플랫폼 물류로 방어"],["통관 정책 변동","중","저가수입품 과세 정책이 자주 바뀜"]],
+},
+{
+  code:"GB", name:"영국", flag:"🇬🇧", currency:"GBP", fx:1750,
+  score:[4,4,3,4.5,2.5],
+  summary:"유럽 진출 관문. 영어권이라 운영은 쉽지만 £135 이하 판매분 VAT 판매자(플랫폼) 징수 의무 등 세무 요건이 까다로움. 플랫폼(아마존·Etsy) 경유 진입 권장 — VAT를 플랫폼이 대행.",
+  priceRange:"쿨백 £12~35 / 토트백 £15~50 / 파우치 £8~20.",
+  markets:[["Amazon UK","~15%","VAT 징수 대행"],["Etsy","~9.5%","디자인 소품 강세"],["eBay UK","~13%",""]],
+  payments:[["신용/직불카드","주류"],["PayPal","보편적"],["Klarna(BNPL)","증가"],["Apple Pay","증가"]],
+  shipping:{kpacket:13000, ems:27000, express:43000, days:"K-Packet 7~14일 / EMS 4~7일 / 특송 2~4일", rec:"K-Packet 기본. 대량화 시 현지 풀필먼트 검토."},
+  customs:"£135 이하: 판매 시점에 VAT 20% 징수 의무(플랫폼 판매 시 플랫폼이 대행). £135 초과: 수입 시 관세+VAT. 직판(자사몰)이면 영국 VAT 등록 필요.",
+  risks:[["VAT 의무","상","자사몰 직판 시 VAT 등록·신고 부담 → 초기엔 플랫폼 판매로 회피"],["반품","중","유럽 소비자법상 14일 청약철회"],["경쟁","중","성숙 시장"]],
+},
+{
+  code:"DE", name:"독일", flag:"🇩🇪", currency:"EUR", fx:1500,
+  score:[4,4,3,4,2.5],
+  summary:"유럽 최대 이커머스 시장. 품질 중시 소비자에 에카사 품질 스토리가 통할 수 있으나, 포장재법(VerpackG) 등록 등 규제 대응이 선행 조건.",
+  priceRange:"Kühltasche €12~40 / 토트백 €15~50 / 파우치 €8~20.",
+  markets:[["Amazon DE","~15%","유럽 5개국 확장 용이"],["Etsy","~9.5%",""],["Kaufland Global","~10%","성장 중"]],
+  payments:[["PayPal","독일 이커머스 1위 수단"],["청구서 결제(Rechnung)","독일 특유 — 후불 선호"],["Klarna","보편적"],["신용카드","상대적으로 낮음"],["Giropay/SEPA","계좌이체"]],
+  shipping:{kpacket:13000, ems:27000, express:43000, days:"K-Packet 8~15일 / EMS 4~8일 / 특송 2~4일", rec:"아마존 FBA(독일 창고) 활용 시 배송 경쟁력 확보. 개별 발송은 IOSS 등록된 플랫폼 경유."},
+  customs:"EU 공통: €150 이하 관세 면제, VAT 19%는 금액 무관 부과(IOSS로 판매 시점 징수). 플랫폼 판매 시 플랫폼이 IOSS 대행.",
+  risks:[["포장재법(VerpackG)","상","독일 판매 시 포장재 등록(LUCID) 의무 — 미등록 판매 금지·과태료"],["반품 문화","상","독일 반품률 유럽 최고 수준 — 반품비 정책 사전 설계"],["VAT/세무","중","플랫폼 경유로 완화 가능"],["언어","중","독일어 상세페이지 필수"]],
+},
+{
+  code:"FR", name:"프랑스", flag:"🇫🇷", currency:"EUR", fx:1500,
+  score:[3.5,4,3,4,2.5],
+  summary:"디자인 감성 소비 강한 시장 — 에카사의 미니멀·감성 디자인과 잘 맞음. 독일과 같은 EU 규제(VAT·EPR) 적용.",
+  priceRange:"sac isotherme €12~40 / 토트백 €15~55 / 파우치 €8~22.",
+  markets:[["Amazon FR","~15%",""],["Etsy","~9.5%","프랑스 감성소비와 잘 맞음"],["Cdiscount","~10%","프랑스 로컬 강자"]],
+  payments:[["Carte Bancaire","프랑스 로컬 카드망 — 필수"],["PayPal","보편적"],["Apple Pay","증가"]],
+  shipping:{kpacket:13000, ems:27000, express:43000, days:"K-Packet 8~15일 / EMS 4~8일 / 특송 2~4일", rec:"독일과 동일 — 플랫폼 경유 권장."},
+  customs:"EU 공통(€150 이하 관세 면제, VAT 20% IOSS 징수). EPR(생산자책임) 등록 의무 품목 확대 중.",
+  risks:[["EPR/포장재","상","프랑스도 포장재·섬유 EPR 등록 의무"],["반품","중","14일 청약철회"],["언어","중","프랑스어 상세페이지 필수 (Toubon법 — 소비자 대상 프랑스어 표기 의무)"]],
+},
+{
+  code:"CA", name:"캐나다", flag:"🇨🇦", currency:"CAD", fx:1000,
+  score:[3,4,3,4.5,3.5],
+  summary:"미국과 묶어 운영 가능한 안정적 시장. 아웃도어 문화로 보냉백 수요 양호. 우편 통관 면세 기준이 낮은 점(C$20)에 유의.",
+  priceRange:"쿨러백 C$20~60 / 토트백 C$25~70 / 파우치 C$12~30.",
+  markets:[["Amazon CA","~15%","미국 계정과 통합 운영"],["Etsy","~9.5%",""],["eBay CA","~13%",""]],
+  payments:[["신용카드","주류"],["PayPal","보편적"],["Interac","캐나다 로컬 직불"],["Apple Pay","증가"]],
+  shipping:{kpacket:13500, ems:28000, express:44000, days:"K-Packet 8~15일 / EMS 4~8일 / 특송 2~4일", rec:"K-Packet 기본. 아마존 CA FBA 병행."},
+  customs:"우편물 C$20 초과 시 세금 부과(택배사 경유 C$40/150 기준 별도) — 면세 한도가 낮아 사실상 대부분 과세. 한-캐 FTA로 관세 절감 가능. 통관수수료(브로커리지) 주의.",
+  risks:[["통관·세금","중","면세 한도 낮음 + 택배사 통관수수료 → 고객 안내 필요"],["시장 규모","중","인구 4천만"],["겨울 배송","하","혹한기 배송 지연"]],
+},
+{
+  code:"CN", name:"중국", flag:"🇨🇳", currency:"CNY", fx:190,
+  score:[4.5,3,3,3,2],
+  summary:"거대 시장이지만 진입장벽 최고 수준 — 티몰글로벌 보증금·연회비, 마케팅 비용, 로컬 경쟁. 개인 셀러보다는 대행사/왕훙 유통 or 샤오홍슈 콘텐츠 기반 진입이 현실적. 후순위 권장.",
+  priceRange:"보냉백 ¥50~200 / 토트백 ¥60~300. 로컬 저가 경쟁 극심, 한국 감성 프리미엄은 콘텐츠 마케팅 성공 시에만 유효.",
+  markets:[["Tmall Global","5~8%+보증금·연회비","진입 비용 高"],["샤오홍슈(RED)","콘텐츠 커머스","K-브랜드 발견 채널"],["Douyin(틱톡 중국)","라이브커머스",""],["타오바오 (대행)","개인 구매대행 경유",""]],
+  payments:[["Alipay","지배적"],["WeChat Pay","지배적"],["UnionPay","카드"]],
+  shipping:{kpacket:8500, ems:18000, express:32000, days:"EMS 3~7일(통관 변수) / 특송 2~4일", rec:"보세창고 크로스보더 모델(대행) 또는 EMS. 개별 직배송은 통관 리스크."},
+  customs:"크로스보더 전자상거래 종합세 약 9.1%(한도 내). 개인 우편은 행우세. 정식 수입은 인증·라벨 요건 복잡.",
+  risks:[["플랫폼 진입장벽","상","보증금·연회비·현지법인 요건"],["마케팅 의존","상","콘텐츠·왕훙 없이는 노출 불가"],["지재권/카피","상","인기 시 카피 제품 빠르게 등장 — 상표 선등록 필수"],["통관","중","정책 변동"],["정치·규제","중","한중 관계 변수"]],
+},
+];
+
+// ---------- 유틸 ----------
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fmt(n){ return Number(n||0).toLocaleString("ko-KR"); }
+function riskBadge(level){ const m={"상":"r-high","중":"r-mid","하":"r-low"}; return `<span class="badge ${m[level]||'r-mid'}">${level}</span>`; }
+function localFmt(v, cur){
+  const dec = (cur==="JPY"||cur==="VND"||cur==="TWD"||cur==="THB")?0:2;
+  return Number(v).toLocaleString("en-US",{minimumFractionDigits:dec, maximumFractionDigits:dec}) + " " + cur;
+}
+
+// ---------- 탭 ----------
+document.getElementById("nav").addEventListener("click", e=>{
+  const btn = e.target.closest("button[data-tab]"); if(!btn) return;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+});
+
+// ---------- 순위 ----------
+function renderRank(){
+  const rows = DATA.map(d=>({d, total:d.score.reduce((a,b)=>a+b,0)}))
+    .sort((a,b)=>b.total-a.total);
+  const medals=["🥇","🥈","🥉"];
+  document.getElementById("rankRows").innerHTML = rows.map((r,i)=>{
+    const pct = (r.total/25*100).toFixed(0);
+    return `<tr>
+      <td class="rank">${medals[i]||(i+1)+"위"}</td>
+      <td style="white-space:nowrap;"><span class="flag">${r.d.flag}</span> <b>${r.d.name}</b></td>
+      ${r.d.score.map(s=>`<td class="right">${s}</td>`).join("")}
+      <td><div class="scorebar"><div style="width:${pct}%"></div></div><span class="muted">${r.total.toFixed(1)} / 25</span></td>
+      <td><button class="btn sm ghost" onclick="gotoCountry('${r.d.code}')">상세</button></td>
+    </tr>`;
+  }).join("");
+}
+function gotoCountry(code){
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelector('nav button[data-tab="country"]').classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("tab-country").classList.add("active");
+  document.getElementById("ctSelect").value = code;
+  renderCountryDetail();
+}
+
+// ---------- 가격 계산기 ----------
+function initCalc(){
+  document.getElementById("pcProduct").innerHTML = PRODUCTS.map((p,i)=>`<option value="${i}">${esc(p.name)} (₩${fmt(p.price)}, ${p.weight}g)</option>`).join("");
+  document.getElementById("pcCountry").innerHTML = DATA.map(d=>`<option value="${d.code}">${d.flag} ${d.name}</option>`).join("");
+  document.getElementById("pcCountry").addEventListener("change", syncCalcDefaults);
+  document.getElementById("pcShip").innerHTML = `<option value="kpacket">K-Packet (저가·경량 추천)</option><option value="ems">EMS (빠름)</option><option value="express">특송 DHL/FedEx (프리미엄)</option>`;
+  syncCalcDefaults();
+}
+function syncCalcDefaults(){
+  const d = DATA.find(x=>x.code===document.getElementById("pcCountry").value);
+  document.getElementById("pcFx").value = d.fx;
+  document.getElementById("pcCurLabel").textContent = d.currency;
+  // 대표 마켓 수수료 첫 항목에서 숫자 추출
+  const feeText = d.markets[0][1]; const m = feeText.match(/(\d+(?:\.\d+)?)/);
+  document.getElementById("pcFee").value = m? m[1] : 12;
+}
+function shipCost(d, method, weight){
+  const base = d.shipping[method]; // 0.5kg 기준
+  const units = Math.max(1, Math.ceil((weight+100)/500)); // 포장 100g 포함
+  return Math.round(base + (units-1)*base*0.4);
+}
+function calcPrice(){
+  const p = PRODUCTS[+document.getElementById("pcProduct").value];
+  const d = DATA.find(x=>x.code===document.getElementById("pcCountry").value);
+  const method = document.getElementById("pcShip").value;
+  const fee = (+document.getElementById("pcFee").value||0)/100;
+  const payFee = (+document.getElementById("pcPayFee").value||0)/100;
+  const margin = (+document.getElementById("pcMargin").value||0)/100;
+  const fx = +document.getElementById("pcFx").value||d.fx;
+  const cost = +document.getElementById("pcCost").value || Math.round(p.price*0.5);
+  const ship = shipCost(d, method, p.weight);
+  const landed = cost + ship;
+  const denom = 1 - fee - payFee - margin;
+  if(denom<=0.05){ document.getElementById("pcResult").innerHTML = `<div class="notice">수수료+마진 합계가 너무 높습니다(95% 초과). 마진율을 낮춰 보세요.</div>`; return; }
+  const priceKRW = landed/denom;
+  const priceLocal = priceKRW/fx;
+  // 보기 좋은 가격으로 반올림
+  let nice;
+  if(d.currency==="JPY") nice = Math.ceil(priceLocal/100)*100 - 10;         // ¥x,x90
+  else if(d.currency==="VND") nice = Math.ceil(priceLocal/10000)*10000 - 1000;
+  else if(d.currency==="TWD"||d.currency==="THB") nice = Math.ceil(priceLocal/10)*10 - 1;
+  else nice = Math.ceil(priceLocal) - 0.01;                                  // $xx.99
+  const niceKRW = nice*fx;
+  const profit = niceKRW*(1-fee-payFee) - landed;
+  const profitPct = (profit/niceKRW*100).toFixed(1);
+  document.getElementById("pcResult").innerHTML = `
+    <div class="result-box">
+      <div class="muted">권장 판매가 — ${d.flag} ${d.name} (${esc(p.name)})</div>
+      <div class="big">${localFmt(nice, d.currency)} <span style="font-size:14px; color:var(--sub);">(≈ ₩${fmt(Math.round(niceKRW))})</span></div>
+      <table style="margin-top:12px; max-width:560px;">
+        <tr><td>제품 원가/공급가</td><td class="right">₩${fmt(cost)}</td></tr>
+        <tr><td>배송비 (${method==="kpacket"?"K-Packet":method==="ems"?"EMS":"특송"}, ${p.weight+100}g 추정)</td><td class="right">₩${fmt(ship)}</td></tr>
+        <tr><td>마켓 수수료 ${(fee*100).toFixed(1)}% + 결제 수수료 ${(payFee*100).toFixed(1)}%</td><td class="right">₩${fmt(Math.round(niceKRW*(fee+payFee)))}</td></tr>
+        <tr><td><b>예상 순이익 (판매가 기준 ${profitPct}%)</b></td><td class="right"><b style="color:${profit>0?'var(--ok)':'var(--danger)'}">₩${fmt(Math.round(profit))}</b></td></tr>
+      </table>
+      <h3>현지 시장 가격대와 비교</h3>
+      <p style="font-size:13px; line-height:1.6;">${esc(d.priceRange)}</p>
+      <p class="muted" style="margin-top:6px;">※ 관세·부가세: ${esc(d.customs)}</p>
+    </div>`;
+}
+
+// ---------- 국가 상세 ----------
+function initCountry(){
+  document.getElementById("ctSelect").innerHTML = DATA.map(d=>`<option value="${d.code}">${d.flag} ${d.name}</option>`).join("");
+  renderCountryDetail();
+}
+function currentCountry(){ return DATA.find(x=>x.code===document.getElementById("ctSelect").value); }
+function renderCountryDetail(){
+  const d = currentCountry();
+  const total = d.score.reduce((a,b)=>a+b,0);
+  document.getElementById("ctDetail").innerHTML = `
+    <div class="grid c2">
+      <div>
+        <h2 style="font-size:20px;">${d.flag} ${d.name} <span class="muted" style="font-weight:normal;">종합 ${total.toFixed(1)}/25점</span></h2>
+        <p style="line-height:1.7; margin:8px 0 14px;">${esc(d.summary)}</p>
+        <h3>💰 적정 가격대</h3>
+        <p style="line-height:1.6;">${esc(d.priceRange)}</p>
+        <h3>🛃 관세·세금</h3>
+        <p style="line-height:1.6;">${esc(d.customs)}</p>
+        <h3>🚚 배송 전략</h3>
+        <div class="kv">
+          <b>K-Packet</b><span>약 ₩${fmt(d.shipping.kpacket)} (0.5kg)</span>
+          <b>EMS</b><span>약 ₩${fmt(d.shipping.ems)} (0.5kg)</span>
+          <b>특송</b><span>약 ₩${fmt(d.shipping.express)}~ (0.5kg)</span>
+          <b>소요일</b><span>${esc(d.shipping.days)}</span>
+          <b>추천</b><span>${esc(d.shipping.rec)}</span>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-top:0;">🛒 추천 마켓플레이스</h3>
+        <table>
+          <thead><tr><th>마켓</th><th>수수료</th><th>비고</th></tr></thead>
+          <tbody>${d.markets.map(m=>`<tr><td><b>${esc(m[0])}</b></td><td>${esc(m[1])}</td><td class="muted">${esc(m[2])}</td></tr>`).join("")}</tbody>
+        </table>
+        <h3>💳 결제수단</h3>
+        <table>
+          <tbody>${d.payments.map(m=>`<tr><td><b>${esc(m[0])}</b></td><td class="muted">${esc(m[1])}</td></tr>`).join("")}</tbody>
+        </table>
+        <h3>⚠️ 리스크</h3>
+        <table>
+          <tbody>${d.risks.map(r=>`<tr><td style="white-space:nowrap;">${riskBadge(r[1])} ${esc(r[0])}</td><td class="muted">${esc(r[2])}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ---------- 결제 비교 ----------
+const PG_GUIDE = {
+  US:"PayPal + Stripe", JP:"Stripe(카드·콘비니) 또는 Qoo10 정산", CN:"Alipay Global 제휴 PG", TW:"Shopee 정산 / TapPay",
+  SG:"Stripe + GrabPay 연동", VN:"플랫폼 정산(COD 대행) 필수", TH:"플랫폼 정산 / 2C2P", AU:"Stripe + PayPal + Afterpay",
+  GB:"Stripe + PayPal + Klarna", DE:"PayPal + Klarna (청구서결제 지원 PG)", FR:"Stripe(CB 지원) + PayPal", CA:"Stripe + PayPal",
+};
+function renderPay(){
+  document.getElementById("payRows").innerHTML = DATA.map(d=>`
+    <tr>
+      <td style="white-space:nowrap;">${d.flag} <b>${d.name}</b></td>
+      <td>${d.payments.map(p=>`<b>${esc(p[0])}</b> <span class="muted">— ${esc(p[1])}</span>`).join("<br>")}</td>
+      <td>${esc(PG_GUIDE[d.code]||"")}</td>
+      <td class="muted">${d.code==="VN"||d.code==="TH" ? "COD 지원 없으면 매출 절반 이상 놓침" : d.code==="DE" ? "후불(청구서) 미지원 시 이탈 큼" : d.code==="TW" ? "편의점 수령 옵션이 전환율 좌우" : ""}</td>
+    </tr>`).join("");
+}
+
+// ---------- 배송 비교 ----------
+function renderShipCompare(){
+  document.getElementById("shipRows").innerHTML = DATA.map(d=>`
+    <tr>
+      <td style="white-space:nowrap;">${d.flag} <b>${d.name}</b></td>
+      <td class="right">₩${fmt(d.shipping.kpacket)}</td>
+      <td class="right">₩${fmt(d.shipping.ems)}</td>
+      <td class="right">₩${fmt(d.shipping.express)}~</td>
+      <td class="muted">${esc(d.shipping.days)}</td>
+      <td class="muted">${esc(d.shipping.rec)}</td>
+    </tr>`).join("");
+}
+
+// ---------- 리스크 비교 ----------
+function renderRisk(){
+  document.getElementById("riskCards").innerHTML = DATA.map(d=>{
+    const high = d.risks.filter(r=>r[1]==="상").length;
+    return `<div class="card" style="margin-bottom:12px;">
+      <h3 style="margin-top:0;">${d.flag} ${d.name} ${high? `<span class="badge r-high">고위험 ${high}건</span>`:'<span class="badge r-low">전반적 안전</span>'}</h3>
+      <table><tbody>
+        ${d.risks.map(r=>`<tr><td style="white-space:nowrap; width:160px;">${riskBadge(r[1])} <b>${esc(r[0])}</b></td><td class="muted">${esc(r[2])}</td></tr>`).join("")}
+      </tbody></table>
+    </div>`;
+  }).join("");
+}
+
+// ---------- AI 심층 분석 (Claude API — 판매관리 프로그램과 API 키 공유) ----------
+function getApiKey(){
+  try{
+    const s = JSON.parse(localStorage.getItem("eckasa_settings")||"{}");
+    return s.apiKey||"";
+  }catch(e){ return ""; }
+}
+async function aiDeepDive(){
+  const d = currentCountry();
+  let key = getApiKey();
+  if(!key){
+    key = prompt("Claude API 키를 입력하세요 (판매관리 프로그램 [설정]에 저장하면 다시 묻지 않습니다):");
+    if(!key) return;
+    try{
+      const s = JSON.parse(localStorage.getItem("eckasa_settings")||"{}");
+      s.apiKey = key.trim(); localStorage.setItem("eckasa_settings", JSON.stringify(s));
+    }catch(e){}
+  }
+  const btn = document.getElementById("aiBtn");
+  btn.disabled = true; btn.innerHTML = `<span class="spin"></span> 리포트 생성 중… (수십 초 걸릴 수 있음)`;
+  document.getElementById("aiModalTitle").textContent = `🤖 AI 심층 분석 — ${d.flag} ${d.name}`;
+  const plist = PRODUCTS.map(p=>`- ${p.name}: ₩${fmt(p.price)}, ${p.weight}g`).join("\n");
+  const system = `당신은 한국 중소 브랜드의 해외진출을 돕는 이커머스 전략 컨설턴트입니다. 실행 가능하고 구체적인 조언을 한국어로 작성하세요. 마크다운 기호(#, *) 대신 ■, ▶, - 를 사용해 일반 텍스트로 읽기 좋게 쓰세요.`;
+  const user = `한국 라이프스타일 가방 브랜드 "에카사(ECKASA)"의 ${d.name} 시장 진출 심층 전략 리포트를 작성해 주세요.
+
+[에카사 제품군]
+${plist}
+브랜드 특성: 보냉백 중심의 감성 디자인 라이프스타일 가방, 공식몰 eckasa.com, 소규모 브랜드.
+
+[${d.name} 시장 기초 데이터]
+- 요약: ${d.summary}
+- 현지 가격대: ${d.priceRange}
+- 마켓플레이스: ${d.markets.map(m=>m[0]+"("+m[1]+")").join(", ")}
+- 결제: ${d.payments.map(p=>p[0]).join(", ")}
+- 배송: ${d.shipping.days} / 추천: ${d.shipping.rec}
+- 관세·세금: ${d.customs}
+- 리스크: ${d.risks.map(r=>`${r[0]}(${r[1]}): ${r[2]}`).join(" / ")}
+
+다음 구성으로 작성:
+■ 1. 이 시장에서 에카사의 승산 (한 줄 결론 + 근거 3가지)
+■ 2. 우선 출시할 제품 3가지와 권장 판매가 (현지 통화)
+■ 3. 진입 채널과 순서 (첫 마켓, 계정 개설 시 준비물 포함)
+■ 4. 마케팅 — 현지 고객에게 통할 소구점과 콘텐츠 아이디어
+■ 5. 리스크 대응 체크리스트 (특히 '상' 등급 리스크)
+■ 6. 첫 90일 액션 플랜 (주차별)`;
+  try{
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key": key,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body: JSON.stringify({ model:"claude-opus-4-8", max_tokens:8000, system, messages:[{role:"user", content:user}] })
+    });
+    const data = await res.json();
+    if(!res.ok){
+      const msg = data && data.error ? data.error.message : ("HTTP "+res.status);
+      throw new Error(res.status===401? "API 키가 올바르지 않습니다." : msg);
+    }
+    const text = data.content.filter(b=>b.type==="text").map(b=>b.text).join("");
+    document.getElementById("aiReport").textContent = text;
+    document.getElementById("aiModalBg").classList.add("open");
+  }catch(err){
+    document.getElementById("aiReport").textContent = "⚠️ 오류: "+err.message;
+    document.getElementById("aiModalBg").classList.add("open");
+  }
+  btn.disabled=false; btn.textContent="🤖 AI 심층 분석 리포트 생성";
+}
+function copyReport(){
+  const t = document.getElementById("aiReport").textContent;
+  if(t) navigator.clipboard.writeText(t).then(()=>alert("복사되었습니다."));
+}
+
+// ---------- 초기화 ----------
+renderRank(); initCalc(); initCountry(); renderPay(); renderShipCompare(); renderRisk();
+</script>
+</body>
+</html>

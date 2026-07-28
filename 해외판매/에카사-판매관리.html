@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에카사 해외판매 관리</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#1d2433; --sub:#6b7280; --line:#e5e8f0;
+    --brand:#2f5d50; --brand2:#3d7a68; --accent:#e8f0ec; --danger:#c0392b; --warn:#b7791f; --ok:#2e7d32;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background:var(--bg); color:var(--ink); font-size:14px;}
+  header{background:var(--brand); color:#fff; padding:14px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  header h1{font-size:19px; letter-spacing:.5px;}
+  header .sub{font-size:12px; opacity:.85;}
+  nav{background:#fff; border-bottom:1px solid var(--line); padding:0 12px; display:flex; flex-wrap:wrap; position:sticky; top:0; z-index:50;}
+  nav button{border:none; background:none; padding:13px 15px; font-size:14px; cursor:pointer; color:var(--sub); border-bottom:3px solid transparent; font-family:inherit;}
+  nav button:hover{color:var(--brand);}
+  nav button.active{color:var(--brand); border-bottom-color:var(--brand); font-weight:bold;}
+  main{padding:20px; max-width:1200px; margin:0 auto;}
+  .tab{display:none;}
+  .tab.active{display:block;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px;}
+  .card h2{font-size:16px; margin-bottom:12px; color:var(--brand);}
+  .card h3{font-size:14px; margin:12px 0 8px;}
+  .grid{display:grid; gap:14px;}
+  .grid.c4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+  .grid.c2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .stat .n{font-size:26px; font-weight:bold; color:var(--brand); margin-top:4px;}
+  .stat .l{font-size:12px; color:var(--sub);}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{background:var(--accent); text-align:left; padding:8px 10px; font-size:12px; color:var(--brand); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  tr:hover td{background:#fafbfd;}
+  .btn{display:inline-block; border:none; border-radius:6px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit; background:var(--brand); color:#fff;}
+  .btn:hover{background:var(--brand2);}
+  .btn.sm{padding:4px 9px; font-size:12px;}
+  .btn.ghost{background:#fff; color:var(--brand); border:1px solid var(--brand);}
+  .btn.gray{background:#eef0f4; color:var(--ink);}
+  .btn.red{background:var(--danger);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  input,select,textarea{border:1px solid #cfd6e0; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; background:#fff; color:var(--ink); width:100%;}
+  input:focus,select:focus,textarea:focus{outline:2px solid #bcd6cc;}
+  label{display:block; font-size:12px; color:var(--sub); margin-bottom:4px;}
+  .frow{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:10px;}
+  .badge{display:inline-block; padding:2px 9px; border-radius:99px; font-size:11px; font-weight:bold; white-space:nowrap;}
+  .b-green{background:#e3f2e5; color:var(--ok);}
+  .b-blue{background:#e3ecf7; color:#1a5da0;}
+  .b-yellow{background:#fdf3dd; color:var(--warn);}
+  .b-red{background:#fbe4e0; color:var(--danger);}
+  .b-gray{background:#eef0f4; color:var(--sub);}
+  .muted{color:var(--sub); font-size:12px;}
+  .right{text-align:right;}
+  .toolbar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+  .low{color:var(--danger); font-weight:bold;}
+  /* 모달 */
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(20,26,40,.5); z-index:100; overflow:auto; padding:30px 12px;}
+  .modal-bg.open{display:block;}
+  .modal{background:#fff; border-radius:12px; max-width:760px; margin:0 auto; padding:22px;}
+  .modal h2{font-size:16px; color:var(--brand); margin-bottom:14px;}
+  .modal .actions{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+  /* 채팅 */
+  .chatbox{height:420px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:14px; background:#fafbfd; margin-bottom:10px;}
+  .msg{max-width:82%; margin-bottom:10px; padding:10px 13px; border-radius:12px; white-space:pre-wrap; line-height:1.55; font-size:13px;}
+  .msg.user{background:var(--brand); color:#fff; margin-left:auto; border-bottom-right-radius:3px;}
+  .msg.ai{background:#fff; border:1px solid var(--line); border-bottom-left-radius:3px;}
+  .msg.sys{background:#fdf3dd; color:#7a5b12; font-size:12px; max-width:100%; text-align:center;}
+  .chat-input{display:flex; gap:8px;}
+  .chat-input textarea{resize:none; height:60px; flex:1;}
+  .spin{display:inline-block; width:14px; height:14px; border:2px solid #cbd5e0; border-top-color:var(--brand); border-radius:50%; animation:sp 0.8s linear infinite; vertical-align:-2px;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .notice{background:#fdf3dd; border:1px solid #f0dfae; color:#7a5b12; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px;}
+  .flag{font-size:16px; margin-right:4px;}
+  .items-editor .irow{display:grid; grid-template-columns:1fr 70px 110px 34px; gap:8px; margin-bottom:6px; align-items:center;}
+  @media(max-width:700px){ main{padding:10px;} .items-editor .irow{grid-template-columns:1fr 60px 90px 30px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ECKASA 해외판매 관리</h1>
+  <span class="sub">에카사 제품 해외 판매 · 재고 · 결제 · 배송 통합 관리</span>
+</header>
+
+<nav id="nav">
+  <button data-tab="dash" class="active">📊 대시보드</button>
+  <button data-tab="links">🔗 판매 링크</button>
+  <button data-tab="stock">📦 재고</button>
+  <button data-tab="orders">🧾 주문·결제</button>
+  <button data-tab="ship">🚚 배송</button>
+  <button data-tab="carriers">📞 배송사 연락</button>
+  <button data-tab="chat">🤖 AI 상담사</button>
+  <button data-tab="trans">🌐 자동 번역</button>
+  <button data-tab="settings">⚙️ 설정</button>
+</nav>
+
+<main>
+
+<!-- ============ 대시보드 ============ -->
+<div class="tab active" id="tab-dash">
+  <div class="grid c4" id="dashStats"></div>
+  <div class="grid c2" style="margin-top:16px;">
+    <div class="card">
+      <h2>⚠️ 재고 부족 상품</h2>
+      <div id="dashLow"></div>
+    </div>
+    <div class="card">
+      <h2>🕐 최근 주문</h2>
+      <div id="dashRecent"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>🌍 국가별 판매 현황</h2>
+    <div id="dashCountry"></div>
+  </div>
+</div>
+
+<!-- ============ 판매 링크 ============ -->
+<div class="tab" id="tab-links">
+  <div class="card">
+    <h2>나라별 판매 링크 관리</h2>
+    <p class="muted" style="margin-bottom:12px;">국가별로 판매 중인 해외 마켓플레이스(아마존, Shopee, Qoo10, Etsy 등)의 내 상점/상품 링크를 등록해 관리합니다.</p>
+    <div class="frow">
+      <div><label>국가</label><select id="lkCountry"></select></div>
+      <div><label>마켓플레이스</label><input id="lkMarket" list="marketList" placeholder="예: Amazon US, Shopee, Qoo10"><datalist id="marketList"></datalist></div>
+      <div style="grid-column:span 2;"><label>판매 링크(URL)</label><input id="lkUrl" placeholder="https://..."></div>
+      <div><label>메모</label><input id="lkMemo" placeholder="수수료, 담당자 등"></div>
+      <div style="align-self:end;"><button class="btn" onclick="addLink()">+ 링크 추가</button></div>
+    </div>
+    <table>
+      <thead><tr><th>국가</th><th>마켓플레이스</th><th>링크</th><th>메모</th><th>상태</th><th></th></tr></thead>
+      <tbody id="linkRows"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>💡 국가별 추천 마켓플레이스</h2>
+    <div id="marketGuide"></div>
+  </div>
+</div>
+
+<!-- ============ 재고 ============ -->
+<div class="tab" id="tab-stock">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">재고 현황</h2>
+      <div>
+        <button class="btn ghost sm" onclick="openProductModal()">+ 제품 추가</button>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:10px;">주문을 <b>발송완료</b> 처리하면 재고가 자동으로 차감됩니다. 입고 시 [+입고] 버튼으로 수량을 더하세요.</p>
+    <table>
+      <thead><tr><th>제품명</th><th>영문명(세관신고용)</th><th class="right">판매가(₩)</th><th class="right">무게(g)</th><th class="right">현재고</th><th class="right">안전재고</th><th>상태</th><th></th></tr></thead>
+      <tbody id="stockRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 주문·결제 ============ -->
+<div class="tab" id="tab-orders">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">주문 · 결제 관리</h2>
+      <button class="btn" onclick="openOrderModal()">+ 새 주문 등록</button>
+    </div>
+    <div class="frow" style="grid-template-columns:180px 180px 1fr;">
+      <div><label>국가 필터</label><select id="odFilterCountry" onchange="renderOrders()"><option value="">전체</option></select></div>
+      <div><label>결제상태 필터</label><select id="odFilterPay" onchange="renderOrders()">
+        <option value="">전체</option><option>결제대기</option><option>결제완료</option><option>부분환불</option><option>환불</option>
+      </select></div>
+    </div>
+    <table>
+      <thead><tr><th>주문번호</th><th>날짜</th><th>국가</th><th>마켓</th><th>고객</th><th>상품</th><th class="right">금액</th><th>결제방식</th><th>결제상태</th><th></th></tr></thead>
+      <tbody id="orderRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 배송 ============ -->
+<div class="tab" id="tab-ship">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">배송 현황</h2>
+      <div><label style="display:inline;">상태 필터 </label>
+      <select id="shFilter" onchange="renderShip()" style="width:auto;">
+        <option value="">전체</option><option>준비중</option><option>발송완료</option><option>통관중</option><option>배송중</option><option>배달완료</option><option>보류/반송</option>
+      </select></div>
+    </div>
+    <p class="muted" style="margin-bottom:10px;">송장번호를 입력하고 배송사를 선택하면 [추적] 버튼으로 배송사 조회 페이지가 열립니다. [라벨]로 배송 라벨을 출력하세요.</p>
+    <table>
+      <thead><tr><th>주문번호</th><th>국가</th><th>고객</th><th>배송사</th><th>송장번호</th><th>배송상태</th><th></th></tr></thead>
+      <tbody id="shipRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 배송사 연락 ============ -->
+<div class="tab" id="tab-carriers">
+  <div class="card">
+    <h2>국제 배송사 직접 컨택</h2>
+    <p class="muted" style="margin-bottom:12px;">전화·홈페이지·픽업(방문수거) 신청 페이지로 바로 연결됩니다. [픽업요청 메일]을 누르면 발송 대기 주문 정보가 담긴 메일 초안이 열립니다. (전화번호는 변경될 수 있으니 홈페이지에서 확인하세요)</p>
+    <div id="carrierCards" class="grid c2"></div>
+  </div>
+  <div class="card">
+    <h2>발송 대기 주문 (픽업 요청 대상)</h2>
+    <div id="pendingShip"></div>
+  </div>
+</div>
+
+<!-- ============ AI 상담사 ============ -->
+<div class="tab" id="tab-chat">
+  <div class="card">
+    <h2>🤖 AI 고객 상담사</h2>
+    <p class="muted" style="margin-bottom:10px;">해외 고객의 문의(영어·일본어 등 어떤 언어든)를 붙여넣으면, <b>고객 언어로 된 답변</b>과 <b>한국어 번역</b>을 함께 만들어 드립니다. 에카사 제품 정보와 설정 탭의 상점 정책을 알고 있는 상담사입니다.</p>
+    <div id="chatApiNotice"></div>
+    <div class="chatbox" id="chatBox"></div>
+    <div class="chat-input">
+      <textarea id="chatInput" placeholder="고객 문의를 붙여넣거나 질문을 입력하세요. (Shift+Enter 줄바꿈, Enter 전송)"></textarea>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <button class="btn" id="chatSend" onclick="sendChat()">전송</button>
+        <button class="btn gray sm" onclick="resetChat()">초기화</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 자동 번역 ============ -->
+<div class="tab" id="tab-trans">
+  <div class="card">
+    <h2>🌐 자동 번역</h2>
+    <p class="muted" style="margin-bottom:10px;">해외 사이트 내용·고객 메시지·리뷰를 붙여넣으면 한국어로 번역합니다. 반대로 한국어 상품설명·답변을 외국어로 번역할 수도 있습니다.</p>
+    <div id="transApiNotice"></div>
+    <div class="frow" style="grid-template-columns:1fr 1fr;">
+      <div>
+        <label>원문 (아무 언어나 붙여넣기)</label>
+        <textarea id="transIn" rows="10" placeholder="번역할 내용을 붙여넣으세요"></textarea>
+      </div>
+      <div>
+        <label>번역 결과</label>
+        <textarea id="transOut" rows="10" readonly style="background:#fafbfd;"></textarea>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <label style="margin:0;">번역 방향:</label>
+      <select id="transTarget" style="width:auto;">
+        <option value="한국어">→ 한국어 (해외 내용 이해하기)</option>
+        <option value="영어">→ 영어 (English)</option>
+        <option value="일본어">→ 일본어 (日本語)</option>
+        <option value="중국어 간체">→ 중국어 간체 (简体)</option>
+        <option value="중국어 번체">→ 중국어 번체 (繁體)</option>
+        <option value="베트남어">→ 베트남어 (Tiếng Việt)</option>
+        <option value="태국어">→ 태국어 (ไทย)</option>
+        <option value="독일어">→ 독일어 (Deutsch)</option>
+        <option value="프랑스어">→ 프랑스어 (Français)</option>
+        <option value="스페인어">→ 스페인어 (Español)</option>
+      </select>
+      <button class="btn" id="transBtn" onclick="doTranslate()">번역하기</button>
+      <button class="btn gray" onclick="copyTrans()">결과 복사</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 설정 ============ -->
+<div class="tab" id="tab-settings">
+  <div class="card">
+    <h2>Claude API 키 (AI 상담사 · 자동 번역에 필요)</h2>
+    <p class="muted" style="margin-bottom:10px;">
+      <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a>에서 API 키를 발급받아 입력하세요. 키는 이 컴퓨터의 브라우저에만 저장됩니다.
+    </p>
+    <div class="frow" style="grid-template-columns:1fr auto;">
+      <div><input type="password" id="setApiKey" placeholder="sk-ant-..."></div>
+      <div><button class="btn" onclick="saveApiKey()">저장</button></div>
+    </div>
+    <div id="apiKeyStatus" class="muted"></div>
+  </div>
+
+  <div class="card">
+    <h2>판매자 정보 (배송 라벨에 인쇄됨)</h2>
+    <div class="frow">
+      <div><label>이름/상호 (영문)</label><input id="setName" placeholder="ECKASA (Eun-ju Park)"></div>
+      <div><label>전화번호</label><input id="setPhone" placeholder="+82-10-0000-0000"></div>
+      <div><label>이메일</label><input id="setEmail" placeholder="hello@eckasa.com"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>주소 (영문 — 라벨용)</label><input id="setAddr" placeholder="123, Songpa-daero, Songpa-gu, Seoul, 05500, Republic of Korea"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>상점 정책 (AI 상담사가 답변에 활용 — 배송기간, 반품, 교환 정책 등)</label>
+      <textarea id="setPolicy" rows="4" placeholder="예: 주문 후 2영업일 내 발송. 배송기간 미국 7~14일, 일본 3~7일. 단순변심 반품은 수령 후 7일 이내, 왕복 배송비 고객 부담. 불량품은 무료 교환."></textarea></div>
+    </div>
+    <button class="btn" onclick="saveSeller()">판매자 정보 저장</button>
+    <span id="sellerSaved" class="muted"></span>
+  </div>
+
+  <div class="card">
+    <h2>데이터 백업</h2>
+    <p class="muted" style="margin-bottom:10px;">모든 데이터(제품·재고·주문·링크·설정)를 파일로 저장하거나 복원합니다. 주기적으로 백업하세요.</p>
+    <button class="btn ghost" onclick="exportData()">📥 백업 파일 저장</button>
+    <button class="btn ghost" onclick="document.getElementById('importFile').click()">📤 백업 불러오기</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    <button class="btn red" style="float:right;" onclick="resetAll()">전체 초기화</button>
+  </div>
+</div>
+
+</main>
+
+<!-- 주문 모달 -->
+<div class="modal-bg" id="orderModalBg">
+  <div class="modal">
+    <h2 id="orderModalTitle">새 주문 등록</h2>
+    <input type="hidden" id="omId">
+    <div class="frow">
+      <div><label>주문일</label><input type="date" id="omDate"></div>
+      <div><label>국가</label><select id="omCountry"></select></div>
+      <div><label>마켓플레이스</label><input id="omMarket" list="marketList" placeholder="Amazon US 등"></div>
+    </div>
+    <div class="frow">
+      <div><label>고객명 (영문)</label><input id="omCustomer"></div>
+      <div><label>고객 전화</label><input id="omPhone"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>배송 주소 (영문)</label><input id="omAddr"></div>
+    </div>
+    <h3>주문 상품</h3>
+    <div class="items-editor" id="omItems"></div>
+    <button class="btn gray sm" onclick="addItemRow()">+ 상품 줄 추가</button>
+    <div class="frow" style="margin-top:12px;">
+      <div><label>통화</label><select id="omCurrency">
+        <option>USD</option><option>JPY</option><option>EUR</option><option>GBP</option><option>TWD</option><option>SGD</option><option>AUD</option><option>CAD</option><option>VND</option><option>THB</option><option>CNY</option><option>KRW</option>
+      </select></div>
+      <div><label>결제 방식</label><select id="omPayMethod">
+        <option>마켓플레이스 정산</option><option>신용카드</option><option>PayPal</option><option>Stripe</option><option>계좌이체</option><option>COD(착불)</option><option>기타</option>
+      </select></div>
+      <div><label>결제 상태</label><select id="omPayStatus">
+        <option>결제대기</option><option>결제완료</option><option>부분환불</option><option>환불</option>
+      </select></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>메모</label><input id="omMemo"></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('orderModalBg')">취소</button>
+      <button class="btn" onclick="saveOrder()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 배송 편집 모달 -->
+<div class="modal-bg" id="shipModalBg">
+  <div class="modal" style="max-width:520px;">
+    <h2>배송 정보</h2>
+    <input type="hidden" id="smId">
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>배송사</label><select id="smCarrier"></select></div>
+      <div><label>송장번호</label><input id="smTracking" placeholder="예: EE123456789KR"></div>
+      <div><label>배송 상태</label><select id="smStatus">
+        <option>준비중</option><option>발송완료</option><option>통관중</option><option>배송중</option><option>배달완료</option><option>보류/반송</option>
+      </select></div>
+    </div>
+    <p class="muted">※ 상태를 <b>발송완료</b>로 처음 바꾸면 주문 수량만큼 재고가 자동 차감됩니다.</p>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('shipModalBg')">취소</button>
+      <button class="btn" onclick="saveShip()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 제품 모달 -->
+<div class="modal-bg" id="productModalBg">
+  <div class="modal" style="max-width:520px;">
+    <h2 id="productModalTitle">제품 추가</h2>
+    <input type="hidden" id="pmId">
+    <div class="frow" style="grid-template-columns:1fr 1fr;">
+      <div><label>제품명 (한글)</label><input id="pmName"></div>
+      <div><label>영문명 (세관신고용)</label><input id="pmNameEn"></div>
+      <div><label>판매가 (₩)</label><input type="number" id="pmPrice"></div>
+      <div><label>무게 (g)</label><input type="number" id="pmWeight"></div>
+      <div><label>현재고</label><input type="number" id="pmStock"></div>
+      <div><label>안전재고</label><input type="number" id="pmSafe"></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('productModalBg')">취소</button>
+      <button class="btn" onclick="saveProduct()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 재고 조정 모달 -->
+<div class="modal-bg" id="adjModalBg">
+  <div class="modal" style="max-width:420px;">
+    <h2 id="adjTitle">재고 입고</h2>
+    <input type="hidden" id="adjId"><input type="hidden" id="adjDir">
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>수량</label><input type="number" id="adjQty" min="1" value="10"></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('adjModalBg')">취소</button>
+      <button class="btn" onclick="applyAdjust()">적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   에카사 해외판매 관리 — 데이터는 브라우저 localStorage에 저장
+   ============================================================ */
+
+// ---------- 기준 데이터 ----------
+const COUNTRIES = [
+  {code:"US", name:"미국", flag:"🇺🇸", currency:"USD", markets:["Amazon US","eBay","Etsy","TikTok Shop US"]},
+  {code:"JP", name:"일본", flag:"🇯🇵", currency:"JPY", markets:["Qoo10 Japan","Amazon Japan","Rakuten","BASE"]},
+  {code:"CN", name:"중국", flag:"🇨🇳", currency:"CNY", markets:["Tmall Global","Taobao","샤오홍슈(RED)","Douyin"]},
+  {code:"TW", name:"대만", flag:"🇹🇼", currency:"TWD", markets:["Shopee Taiwan","PChome","momo"]},
+  {code:"SG", name:"싱가포르", flag:"🇸🇬", currency:"SGD", markets:["Shopee SG","Lazada SG","Amazon SG"]},
+  {code:"VN", name:"베트남", flag:"🇻🇳", currency:"VND", markets:["Shopee VN","Lazada VN","TikTok Shop VN"]},
+  {code:"TH", name:"태국", flag:"🇹🇭", currency:"THB", markets:["Shopee TH","Lazada TH","TikTok Shop TH"]},
+  {code:"AU", name:"호주", flag:"🇦🇺", currency:"AUD", markets:["Amazon AU","eBay AU","Etsy"]},
+  {code:"GB", name:"영국", flag:"🇬🇧", currency:"GBP", markets:["Amazon UK","Etsy","eBay UK"]},
+  {code:"DE", name:"독일", flag:"🇩🇪", currency:"EUR", markets:["Amazon DE","Etsy","Kaufland"]},
+  {code:"FR", name:"프랑스", flag:"🇫🇷", currency:"EUR", markets:["Amazon FR","Etsy","Cdiscount"]},
+  {code:"CA", name:"캐나다", flag:"🇨🇦", currency:"CAD", markets:["Amazon CA","Etsy","eBay CA"]},
+];
+// 대략적 환율 (₩ 기준, 대시보드 합산용 추정치)
+const FX = {USD:1380, JPY:9.3, EUR:1500, GBP:1750, TWD:43, SGD:1030, AUD:900, CAD:1000, VND:0.055, THB:39, CNY:190, KRW:1};
+
+const CARRIERS = [
+  {name:"우체국 EMS", phone:"1588-1300", site:"https://ems.epost.go.kr", pickup:"https://ems.epost.go.kr",
+   track:"https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=", desc:"국제특급우편. 2~7일. 가장 보편적, 방문접수(픽업) 가능."},
+  {name:"우체국 K-Packet", phone:"1588-1300", site:"https://ems.epost.go.kr", pickup:"https://ems.epost.go.kr",
+   track:"https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=", desc:"2kg 이하 소형·경량 상품에 최저가. 7~15일. 계약 후 이용."},
+  {name:"DHL Express", phone:"1588-0001", site:"https://www.dhl.com/kr-ko/home.html", pickup:"https://mydhl.express.dhl/kr/ko/schedule-pickup.html",
+   track:"https://www.dhl.com/kr-ko/home/tracking.html?tracking-id=", desc:"프리미엄 특송. 1~4일. 고가·긴급 배송에 적합."},
+  {name:"FedEx", phone:"080-023-8000", site:"https://www.fedex.com/ko-kr/home.html", pickup:"https://www.fedex.com/ko-kr/shipping/schedule-manage-pickups.html",
+   track:"https://www.fedex.com/fedextrack/?trknbr=", desc:"프리미엄 특송. 1~4일. 미주 강세."},
+  {name:"UPS", phone:"1588-6886", site:"https://www.ups.com/kr/ko/Home.page", pickup:"https://www.ups.com/pickup/schedule?loc=ko_KR",
+   track:"https://www.ups.com/track?tracknum=", desc:"프리미엄 특송. 미주·유럽 강세."},
+  {name:"CJ대한통운 국제택배", phone:"1588-1255", site:"https://www.cjlogistics.com/ko/tool/international/tracking", pickup:"https://www.cjlogistics.com/ko/network/ko-kr",
+   track:"https://www.cjlogistics.com/ko/tool/international/tracking?paramInvcNo=", desc:"국제택배·해외직배송 서비스."},
+];
+
+const SEED_PRODUCTS = [
+  {name:"싱글 보냉백", nameEn:"Single Cooler Bag", price:41000, weight:350},
+  {name:"데일리 보틀백(보냉백)", nameEn:"Daily Bottle Cooler Bag", price:38000, weight:250},
+  {name:"스팽글 토트백", nameEn:"Sequin Tote Bag", price:41000, weight:300},
+  {name:"에카사 트래블 파우치", nameEn:"Travel Pouch", price:19000, weight:120},
+  {name:"컬러 파우치", nameEn:"Color Pouch", price:15000, weight:80},
+  {name:"스트랩 파우치", nameEn:"Strap Pouch", price:19000, weight:100},
+  {name:"스퀘어 보냉백", nameEn:"Square Cooler Bag", price:45000, weight:400},
+  {name:"원형 보냉백", nameEn:"Round Cooler Bag", price:45000, weight:380},
+  {name:"토바 보냉백", nameEn:"Toba Cooler Bag", price:53000, weight:450},
+  {name:"모노백", nameEn:"Mono Bag", price:41000, weight:320},
+  {name:"토바백", nameEn:"Toba Bag", price:33000, weight:300},
+  {name:"노트북 파우치 16인치", nameEn:"Laptop Pouch 16 inch", price:39000, weight:350},
+  {name:"피크닉 매트", nameEn:"Picnic Mat", price:29000, weight:500},
+  {name:"플레이 스트랩", nameEn:"Play Strap", price:5000, weight:50},
+];
+
+// ---------- 상태 ----------
+function load(key, def){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+let products = load("eckasa_products", null);
+if(!products){
+  products = SEED_PRODUCTS.map((p,i)=>({id:"P"+(i+1), ...p, stock:50, safe:10}));
+  save("eckasa_products", products);
+}
+let links = load("eckasa_links", []);
+let orders = load("eckasa_orders", []);
+let settings = load("eckasa_settings", {apiKey:"", name:"", phone:"", email:"", addr:"", policy:""});
+let chatHistory = load("eckasa_chat", []);
+
+function persistAll(){
+  save("eckasa_products", products); save("eckasa_links", links);
+  save("eckasa_orders", orders); save("eckasa_settings", settings); save("eckasa_chat", chatHistory);
+}
+
+// ---------- 유틸 ----------
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fmt(n){ return Number(n||0).toLocaleString("ko-KR"); }
+function genId(prefix){ return prefix + Date.now().toString(36).toUpperCase() + Math.floor(Math.random()*100); }
+function countryByCode(c){ return COUNTRIES.find(x=>x.code===c); }
+function productById(id){ return products.find(p=>p.id===id); }
+function orderTotal(o){ return (o.items||[]).reduce((s,it)=>s + it.qty*it.unitPrice, 0); }
+function orderTotalKRW(o){ return Math.round(orderTotal(o) * (FX[o.currency]||1)); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+function payBadge(s){ const m={"결제완료":"b-green","결제대기":"b-yellow","부분환불":"b-red","환불":"b-red"}; return `<span class="badge ${m[s]||'b-gray'}">${esc(s)}</span>`; }
+function shipBadge(s){ const m={"준비중":"b-gray","발송완료":"b-blue","통관중":"b-yellow","배송중":"b-blue","배달완료":"b-green","보류/반송":"b-red"}; return `<span class="badge ${m[s]||'b-gray'}">${esc(s)}</span>`; }
+
+// ---------- 탭 ----------
+document.getElementById("nav").addEventListener("click", e=>{
+  const btn = e.target.closest("button[data-tab]"); if(!btn) return;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  renderAll();
+});
+
+// ---------- 대시보드 ----------
+function renderDash(){
+  const totalOrders = orders.length;
+  const now = new Date(); const ym = now.toISOString().slice(0,7);
+  const monthSales = orders.filter(o=>o.payStatus==="결제완료" && (o.date||"").startsWith(ym)).reduce((s,o)=>s+orderTotalKRW(o),0);
+  const lowCnt = products.filter(p=>p.stock<=p.safe).length;
+  const shipping = orders.filter(o=>["발송완료","통관중","배송중"].includes(o.shipStatus)).length;
+  document.getElementById("dashStats").innerHTML = `
+    <div class="stat"><div class="l">총 주문</div><div class="n">${fmt(totalOrders)}건</div></div>
+    <div class="stat"><div class="l">이번 달 매출 (결제완료, 원화환산)</div><div class="n">₩${fmt(monthSales)}</div></div>
+    <div class="stat"><div class="l">재고 부족 상품</div><div class="n" style="color:${lowCnt? 'var(--danger)':'var(--brand)'}">${lowCnt}종</div></div>
+    <div class="stat"><div class="l">배송 진행 중</div><div class="n">${shipping}건</div></div>`;
+
+  const lows = products.filter(p=>p.stock<=p.safe);
+  document.getElementById("dashLow").innerHTML = lows.length
+    ? "<table><thead><tr><th>제품</th><th class='right'>현재고</th><th class='right'>안전재고</th></tr></thead><tbody>" +
+      lows.map(p=>`<tr><td>${esc(p.name)}</td><td class="right low">${p.stock}</td><td class="right">${p.safe}</td></tr>`).join("") + "</tbody></table>"
+    : "<p class='muted'>재고 부족 상품이 없습니다. 👍</p>";
+
+  const recent = [...orders].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,6);
+  document.getElementById("dashRecent").innerHTML = recent.length
+    ? "<table><thead><tr><th>날짜</th><th>국가</th><th>고객</th><th class='right'>금액</th><th>배송</th></tr></thead><tbody>" +
+      recent.map(o=>{const c=countryByCode(o.country);return `<tr><td>${esc(o.date)}</td><td>${c?c.flag+" "+c.name:esc(o.country)}</td><td>${esc(o.customer)}</td><td class="right">${fmt(orderTotal(o))} ${esc(o.currency)}</td><td>${shipBadge(o.shipStatus)}</td></tr>`;}).join("") + "</tbody></table>"
+    : "<p class='muted'>아직 주문이 없습니다. [주문·결제] 탭에서 첫 주문을 등록해 보세요.</p>";
+
+  const byC = {};
+  orders.forEach(o=>{ if(!byC[o.country]) byC[o.country]={cnt:0,krw:0}; byC[o.country].cnt++; byC[o.country].krw+=orderTotalKRW(o); });
+  const rows = Object.entries(byC).sort((a,b)=>b[1].krw-a[1].krw);
+  document.getElementById("dashCountry").innerHTML = rows.length
+    ? "<table><thead><tr><th>국가</th><th class='right'>주문수</th><th class='right'>매출(원화환산)</th></tr></thead><tbody>" +
+      rows.map(([code,v])=>{const c=countryByCode(code);return `<tr><td>${c?c.flag+" "+c.name:esc(code)}</td><td class="right">${v.cnt}</td><td class="right">₩${fmt(v.krw)}</td></tr>`;}).join("") + "</tbody></table>"
+    : "<p class='muted'>판매 데이터가 쌓이면 국가별 현황이 표시됩니다.</p>";
+}
+
+// ---------- 판매 링크 ----------
+function initLinkForm(){
+  document.getElementById("lkCountry").innerHTML = COUNTRIES.map(c=>`<option value="${c.code}">${c.flag} ${c.name}</option>`).join("");
+  const allMarkets = [...new Set(COUNTRIES.flatMap(c=>c.markets))];
+  document.getElementById("marketList").innerHTML = allMarkets.map(m=>`<option value="${esc(m)}">`).join("");
+  document.getElementById("marketGuide").innerHTML =
+    "<table><thead><tr><th>국가</th><th>추천 마켓플레이스</th></tr></thead><tbody>" +
+    COUNTRIES.map(c=>`<tr><td style="white-space:nowrap;">${c.flag} ${c.name}</td><td>${c.markets.join(" · ")}</td></tr>`).join("") + "</tbody></table>";
+}
+function addLink(){
+  const country = document.getElementById("lkCountry").value;
+  const market = document.getElementById("lkMarket").value.trim();
+  const url = document.getElementById("lkUrl").value.trim();
+  const memo = document.getElementById("lkMemo").value.trim();
+  if(!market || !url){ alert("마켓플레이스와 링크를 입력하세요."); return; }
+  links.push({id:genId("L"), country, market, url, memo, active:true});
+  persistAll(); renderLinks();
+  document.getElementById("lkMarket").value=""; document.getElementById("lkUrl").value=""; document.getElementById("lkMemo").value="";
+}
+function toggleLink(id){ const l=links.find(x=>x.id===id); if(l){ l.active=!l.active; persistAll(); renderLinks(); } }
+function delLink(id){ if(confirm("이 링크를 삭제할까요?")){ links=links.filter(x=>x.id!==id); persistAll(); renderLinks(); } }
+function renderLinks(){
+  document.getElementById("linkRows").innerHTML = links.length ? links.map(l=>{
+    const c=countryByCode(l.country);
+    return `<tr>
+      <td style="white-space:nowrap;">${c?c.flag+" "+c.name:esc(l.country)}</td>
+      <td>${esc(l.market)}</td>
+      <td><a href="${esc(l.url)}" target="_blank" style="color:var(--brand);">${esc(l.url.length>42? l.url.slice(0,42)+"…" : l.url)}</a></td>
+      <td class="muted">${esc(l.memo)}</td>
+      <td>${l.active?'<span class="badge b-green">판매중</span>':'<span class="badge b-gray">중지</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn sm gray" onclick="toggleLink('${l.id}')">${l.active?"중지":"재개"}</button>
+        <button class="btn sm red" onclick="delLink('${l.id}')">삭제</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="6" class="muted">등록된 판매 링크가 없습니다. 위에서 추가하세요.</td></tr>`;
+}
+
+// ---------- 재고 ----------
+function renderStock(){
+  document.getElementById("stockRows").innerHTML = products.map(p=>{
+    const low = p.stock<=p.safe;
+    return `<tr>
+      <td><b>${esc(p.name)}</b></td><td class="muted">${esc(p.nameEn)}</td>
+      <td class="right">₩${fmt(p.price)}</td><td class="right">${fmt(p.weight)}</td>
+      <td class="right ${low?'low':''}">${fmt(p.stock)}</td><td class="right">${fmt(p.safe)}</td>
+      <td>${low?'<span class="badge b-red">부족</span>':'<span class="badge b-green">정상</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn sm ghost" onclick="openAdjust('${p.id}',1)">+입고</button>
+        <button class="btn sm gray" onclick="openAdjust('${p.id}',-1)">−차감</button>
+        <button class="btn sm gray" onclick="openProductModal('${p.id}')">수정</button>
+      </td></tr>`;
+  }).join("");
+}
+function openProductModal(id){
+  const p = id? productById(id) : null;
+  document.getElementById("productModalTitle").textContent = p? "제품 수정" : "제품 추가";
+  document.getElementById("pmId").value = p? p.id : "";
+  document.getElementById("pmName").value = p? p.name : "";
+  document.getElementById("pmNameEn").value = p? p.nameEn : "";
+  document.getElementById("pmPrice").value = p? p.price : "";
+  document.getElementById("pmWeight").value = p? p.weight : "";
+  document.getElementById("pmStock").value = p? p.stock : 0;
+  document.getElementById("pmSafe").value = p? p.safe : 10;
+  openModal("productModalBg");
+}
+function saveProduct(){
+  const id = document.getElementById("pmId").value;
+  const data = {
+    name: document.getElementById("pmName").value.trim(),
+    nameEn: document.getElementById("pmNameEn").value.trim(),
+    price: +document.getElementById("pmPrice").value||0,
+    weight: +document.getElementById("pmWeight").value||0,
+    stock: +document.getElementById("pmStock").value||0,
+    safe: +document.getElementById("pmSafe").value||0,
+  };
+  if(!data.name){ alert("제품명을 입력하세요."); return; }
+  if(id){ Object.assign(productById(id), data); }
+  else{ products.push({id:genId("P"), ...data}); }
+  persistAll(); closeModal("productModalBg"); renderAll();
+}
+function openAdjust(id, dir){
+  document.getElementById("adjId").value=id; document.getElementById("adjDir").value=dir;
+  document.getElementById("adjTitle").textContent = (dir>0?"재고 입고 — ":"재고 차감 — ") + productById(id).name;
+  document.getElementById("adjQty").value=10;
+  openModal("adjModalBg");
+}
+function applyAdjust(){
+  const p = productById(document.getElementById("adjId").value);
+  const dir = +document.getElementById("adjDir").value;
+  const qty = Math.abs(+document.getElementById("adjQty").value||0);
+  p.stock = Math.max(0, p.stock + dir*qty);
+  persistAll(); closeModal("adjModalBg"); renderAll();
+}
+
+// ---------- 주문 ----------
+function initOrderForm(){
+  const opts = COUNTRIES.map(c=>`<option value="${c.code}">${c.flag} ${c.name}</option>`).join("");
+  document.getElementById("omCountry").innerHTML = opts;
+  document.getElementById("odFilterCountry").innerHTML = `<option value="">전체</option>` + opts;
+  document.getElementById("smCarrier").innerHTML = CARRIERS.map(c=>`<option>${c.name}</option>`).join("");
+}
+function itemRowHtml(item){
+  const opts = products.map(p=>`<option value="${p.id}" ${item&&item.productId===p.id?"selected":""}>${esc(p.name)}</option>`).join("");
+  return `<div class="irow">
+    <select class="it-p">${opts}</select>
+    <input type="number" class="it-q" min="1" value="${item?item.qty:1}" title="수량">
+    <input type="number" class="it-u" step="0.01" value="${item?item.unitPrice:""}" placeholder="판매단가" title="현지통화 단가">
+    <button class="btn sm red" onclick="this.parentElement.remove()">×</button>
+  </div>`;
+}
+function addItemRow(item){ document.getElementById("omItems").insertAdjacentHTML("beforeend", itemRowHtml(item)); }
+function openOrderModal(id){
+  const o = id? orders.find(x=>x.id===id) : null;
+  document.getElementById("orderModalTitle").textContent = o? ("주문 수정 — "+o.id) : "새 주문 등록";
+  document.getElementById("omId").value = o? o.id : "";
+  document.getElementById("omDate").value = o? o.date : new Date().toISOString().slice(0,10);
+  document.getElementById("omCountry").value = o? o.country : "US";
+  document.getElementById("omMarket").value = o? o.market : "";
+  document.getElementById("omCustomer").value = o? o.customer : "";
+  document.getElementById("omPhone").value = o? (o.phone||"") : "";
+  document.getElementById("omAddr").value = o? o.addr : "";
+  document.getElementById("omCurrency").value = o? o.currency : "USD";
+  document.getElementById("omPayMethod").value = o? o.payMethod : "마켓플레이스 정산";
+  document.getElementById("omPayStatus").value = o? o.payStatus : "결제완료";
+  document.getElementById("omMemo").value = o? (o.memo||"") : "";
+  document.getElementById("omItems").innerHTML = "";
+  if(o && o.items.length){ o.items.forEach(it=>addItemRow(it)); } else { addItemRow(); }
+  openModal("orderModalBg");
+}
+function collectItems(){
+  const rows = [...document.querySelectorAll("#omItems .irow")];
+  return rows.map(r=>({
+    productId: r.querySelector(".it-p").value,
+    qty: Math.max(1, +r.querySelector(".it-q").value||1),
+    unitPrice: +r.querySelector(".it-u").value||0,
+  })).filter(it=>it.productId);
+}
+function saveOrder(){
+  const id = document.getElementById("omId").value;
+  const items = collectItems();
+  if(!items.length){ alert("주문 상품을 1개 이상 추가하세요."); return; }
+  const customer = document.getElementById("omCustomer").value.trim();
+  if(!customer){ alert("고객명을 입력하세요."); return; }
+  const data = {
+    date: document.getElementById("omDate").value,
+    country: document.getElementById("omCountry").value,
+    market: document.getElementById("omMarket").value.trim(),
+    customer, phone: document.getElementById("omPhone").value.trim(),
+    addr: document.getElementById("omAddr").value.trim(),
+    currency: document.getElementById("omCurrency").value,
+    payMethod: document.getElementById("omPayMethod").value,
+    payStatus: document.getElementById("omPayStatus").value,
+    memo: document.getElementById("omMemo").value.trim(),
+    items,
+  };
+  if(id){
+    const o = orders.find(x=>x.id===id); Object.assign(o, data);
+  } else {
+    orders.push({id:genId("EK"), ...data, shipStatus:"준비중", carrier:"", tracking:"", stockDeducted:false});
+  }
+  persistAll(); closeModal("orderModalBg"); renderAll();
+}
+function delOrder(id){
+  if(confirm("이 주문을 삭제할까요?")){ orders=orders.filter(o=>o.id!==id); persistAll(); renderAll(); }
+}
+function itemsSummary(o){
+  return o.items.map(it=>{const p=productById(it.productId); return `${p?p.name:"?"} ×${it.qty}`;}).join(", ");
+}
+function renderOrders(){
+  const fc = document.getElementById("odFilterCountry").value;
+  const fp = document.getElementById("odFilterPay").value;
+  const list = orders.filter(o=>(!fc||o.country===fc)&&(!fp||o.payStatus===fp))
+    .sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("orderRows").innerHTML = list.length ? list.map(o=>{
+    const c=countryByCode(o.country);
+    return `<tr>
+      <td style="white-space:nowrap;"><b>${esc(o.id)}</b></td><td>${esc(o.date)}</td>
+      <td style="white-space:nowrap;">${c?c.flag+" "+c.name:esc(o.country)}</td><td>${esc(o.market)}</td>
+      <td>${esc(o.customer)}</td><td class="muted">${esc(itemsSummary(o))}</td>
+      <td class="right" style="white-space:nowrap;">${fmt(orderTotal(o))} ${esc(o.currency)}</td>
+      <td>${esc(o.payMethod)}</td><td>${payBadge(o.payStatus)}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn sm gray" onclick="openOrderModal('${o.id}')">수정</button>
+        <button class="btn sm red" onclick="delOrder('${o.id}')">삭제</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="10" class="muted">주문이 없습니다.</td></tr>`;
+}
+
+// ---------- 배송 ----------
+function renderShip(){
+  const f = document.getElementById("shFilter").value;
+  const list = orders.filter(o=>!f||o.shipStatus===f).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("shipRows").innerHTML = list.length ? list.map(o=>{
+    const c=countryByCode(o.country);
+    const carrier = CARRIERS.find(x=>x.name===o.carrier);
+    const trackBtn = (o.tracking && carrier)
+      ? `<a class="btn sm ghost" style="text-decoration:none;" target="_blank" href="${carrier.track}${encodeURIComponent(o.tracking)}">추적</a>` : "";
+    return `<tr>
+      <td style="white-space:nowrap;"><b>${esc(o.id)}</b></td>
+      <td style="white-space:nowrap;">${c?c.flag+" "+c.name:esc(o.country)}</td>
+      <td>${esc(o.customer)}</td><td>${esc(o.carrier||"—")}</td>
+      <td>${esc(o.tracking||"—")}</td><td>${shipBadge(o.shipStatus)}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn sm" onclick="openShipModal('${o.id}')">배송정보</button>
+        ${trackBtn}
+        <button class="btn sm ghost" onclick="printLabel('${o.id}')">라벨</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="7" class="muted">표시할 주문이 없습니다.</td></tr>`;
+}
+function openShipModal(id){
+  const o = orders.find(x=>x.id===id);
+  document.getElementById("smId").value=o.id;
+  document.getElementById("smCarrier").value = o.carrier || CARRIERS[0].name;
+  document.getElementById("smTracking").value = o.tracking||"";
+  document.getElementById("smStatus").value = o.shipStatus||"준비중";
+  openModal("shipModalBg");
+}
+function saveShip(){
+  const o = orders.find(x=>x.id===document.getElementById("smId").value);
+  o.carrier = document.getElementById("smCarrier").value;
+  o.tracking = document.getElementById("smTracking").value.trim();
+  const newStatus = document.getElementById("smStatus").value;
+  // 최초 발송 처리 시 재고 자동 차감
+  if(!o.stockDeducted && ["발송완료","통관중","배송중","배달완료"].includes(newStatus)){
+    o.items.forEach(it=>{ const p=productById(it.productId); if(p) p.stock=Math.max(0,p.stock-it.qty); });
+    o.stockDeducted = true;
+  }
+  o.shipStatus = newStatus;
+  persistAll(); closeModal("shipModalBg"); renderAll();
+}
+
+// ---------- 라벨 출력 (Code39 바코드 포함) ----------
+const CODE39 = {
+  "0":"000110100","1":"100100001","2":"001100001","3":"101100000","4":"000110001","5":"100110000",
+  "6":"001110000","7":"000100101","8":"100100100","9":"001100100","A":"100001001","B":"001001001",
+  "C":"101001000","D":"000011001","E":"100011000","F":"001011000","G":"000001101","H":"100001100",
+  "I":"001001100","J":"000011100","K":"100000011","L":"001000011","M":"101000010","N":"000010011",
+  "O":"100010010","P":"001010010","Q":"000000111","R":"100000110","S":"001000110","T":"000010110",
+  "U":"110000001","V":"011000001","W":"111000000","X":"010010001","Y":"110010000","Z":"011010000",
+  "-":"010000101",".":"110000100"," ":"011000100","*":"010010100","$":"010101000","/":"010100010",
+  "+":"010001010","%":"000101010"
+};
+function barcodeSvg(text, height){
+  height = height||54;
+  const clean = ("*" + String(text).toUpperCase().replace(/[^0-9A-Z\-\. \$\/\+%]/g,"") + "*");
+  const narrow=2, wide=5, gap=2;
+  let x=0; let bars=[];
+  for(const ch of clean){
+    const pat = CODE39[ch]; if(!pat) continue;
+    for(let i=0;i<9;i++){
+      const w = pat[i]==="1"? wide : narrow;
+      if(i%2===0){ bars.push(`<rect x="${x}" y="0" width="${w}" height="${height}"/>`); }
+      x += w;
+    }
+    x += gap;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${x}" height="${height+16}" viewBox="0 0 ${x} ${height+16}">
+    <g fill="#000">${bars.join("")}</g>
+    <text x="${x/2}" y="${height+13}" font-size="11" font-family="monospace" text-anchor="middle">${esc(text)}</text></svg>`;
+}
+function printLabel(orderId){
+  const o = orders.find(x=>x.id===orderId);
+  const c = countryByCode(o.country);
+  const totalWeight = o.items.reduce((s,it)=>{const p=productById(it.productId); return s+(p?p.weight*it.qty:0);},0) + 100; // 포장재 100g
+  const totalUSD = (orderTotalKRW(o)/FX.USD).toFixed(2);
+  const itemRows = o.items.map(it=>{
+    const p=productById(it.productId);
+    const usd = p? ((p.price*(FX.KRW))/FX.USD).toFixed(2) : "0.00";
+    return `<tr><td>${esc(p?p.nameEn:"Item")} (Textile bag)</td><td class="ct">${it.qty}</td><td class="ct">${p?p.weight*it.qty:0} g</td><td class="ct">$${usd}</td></tr>`;
+  }).join("");
+  const barcode = barcodeSvg(o.tracking || o.id);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>배송 라벨 - ${esc(o.id)}</title>
+  <style>
+    body{font-family:Arial,'Malgun Gothic',sans-serif; margin:0; padding:20px; color:#000;}
+    .label{width:100mm; min-height:150mm; border:2px solid #000; padding:14px; box-sizing:border-box;}
+    .row{display:flex; justify-content:space-between; align-items:flex-start;}
+    h3{margin:0 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:1px;}
+    .box{border:1px solid #000; padding:8px; margin-bottom:8px; font-size:13px; line-height:1.5;}
+    .to{font-size:16px; font-weight:bold;}
+    .country{font-size:20px; font-weight:bold; letter-spacing:1px;}
+    table{width:100%; border-collapse:collapse; font-size:11px; margin-top:4px;}
+    th,td{border:1px solid #000; padding:3px 5px; text-align:left;}
+    .ct{text-align:center;}
+    .bc{text-align:center; margin:10px 0;}
+    .small{font-size:10px;}
+    .cn22{border:2px solid #000; padding:6px; margin-top:8px;}
+    @media print{ body{padding:0;} .noprint{display:none;} }
+  </style></head><body>
+  <div class="label">
+    <div class="row">
+      <div style="width:48%;">
+        <h3>From (발송인)</h3>
+        <div class="box small">
+          <b>${esc(settings.name||"ECKASA")}</b><br>
+          ${esc(settings.addr||"(설정 탭에서 판매자 주소를 입력하세요)")}<br>
+          Tel: ${esc(settings.phone||"-")}<br>
+          REPUBLIC OF KOREA
+        </div>
+      </div>
+      <div style="width:48%;">
+        <h3>Ship To (수취인)</h3>
+        <div class="box">
+          <span class="to">${esc(o.customer)}</span><br>
+          ${esc(o.addr||"(주소 미입력)")}<br>
+          Tel: ${esc(o.phone||"-")}<br>
+          <span class="country">${c? c.name.toUpperCase()+" / "+c.code : esc(o.country)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="bc">${barcode}</div>
+    <div class="row small">
+      <div>주문번호: <b>${esc(o.id)}</b> &nbsp; 배송사: <b>${esc(o.carrier||"-")}</b></div>
+      <div>총 무게(포장 포함): <b>${fmt(totalWeight)} g</b></div>
+    </div>
+    <div class="cn22">
+      <h3>Customs Declaration CN22 (세관신고서)</h3>
+      <table>
+        <tr><th>Description of contents</th><th class="ct">Qty</th><th class="ct">Weight</th><th class="ct">Value</th></tr>
+        ${itemRows}
+        <tr><td><b>Total</b></td><td></td><td class="ct"><b>${fmt(totalWeight)} g</b></td><td class="ct"><b>$${totalUSD}</b></td></tr>
+      </table>
+      <div class="small" style="margin-top:4px;">
+        ☑ Sale of goods &nbsp; Country of Origin: <b>Republic of Korea</b><br>
+        I certify that the particulars given are correct. &nbsp; Date: ${new Date().toISOString().slice(0,10)} &nbsp; Signature: ______________
+      </div>
+    </div>
+  </div>
+  <p class="noprint" style="margin-top:14px;"><button onclick="window.print()" style="padding:10px 24px; font-size:15px; cursor:pointer;">🖨️ 인쇄하기</button>
+  <span style="font-size:12px; color:#666;">※ 실제 발송 시 배송사 공식 운송장이 별도로 필요할 수 있습니다. 이 라벨은 주소·세관신고 보조용입니다.</span></p>
+  </body></html>`;
+  const w = window.open("", "_blank");
+  w.document.write(html); w.document.close();
+}
+
+// ---------- 배송사 ----------
+function renderCarriers(){
+  document.getElementById("carrierCards").innerHTML = CARRIERS.map((c,i)=>`
+    <div class="card" style="margin-bottom:0;">
+      <h3 style="margin-top:0;">${esc(c.name)}</h3>
+      <p class="muted" style="margin-bottom:8px;">${esc(c.desc)}</p>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <a class="btn sm" style="text-decoration:none;" href="tel:${c.phone.replace(/-/g,"")}">📞 ${c.phone}</a>
+        <a class="btn sm ghost" style="text-decoration:none;" target="_blank" href="${c.site}">홈페이지</a>
+        <a class="btn sm ghost" style="text-decoration:none;" target="_blank" href="${c.pickup}">픽업 신청</a>
+        <button class="btn sm gray" onclick="pickupMail(${i})">픽업요청 메일</button>
+      </div>
+    </div>`).join("");
+  const pend = orders.filter(o=>o.shipStatus==="준비중");
+  document.getElementById("pendingShip").innerHTML = pend.length
+    ? "<table><thead><tr><th>주문번호</th><th>국가</th><th>고객</th><th>상품</th></tr></thead><tbody>"+
+      pend.map(o=>{const c=countryByCode(o.country);return `<tr><td>${esc(o.id)}</td><td>${c?c.flag+" "+c.name:esc(o.country)}</td><td>${esc(o.customer)}</td><td class="muted">${esc(itemsSummary(o))}</td></tr>`;}).join("")+"</tbody></table>"
+    : "<p class='muted'>발송 대기(준비중) 주문이 없습니다.</p>";
+}
+function pickupMail(idx){
+  const c = CARRIERS[idx];
+  const pend = orders.filter(o=>o.shipStatus==="준비중");
+  const lines = pend.map(o=>{
+    const ct=countryByCode(o.country);
+    const w = o.items.reduce((s,it)=>{const p=productById(it.productId); return s+(p?p.weight*it.qty:0);},0)+100;
+    return `- ${o.id} / ${ct?ct.name:o.country} / ${w}g / ${itemsSummary(o)}`;
+  }).join("\n");
+  const subject = encodeURIComponent(`[픽업 요청] ${settings.name||"에카사"} 국제발송 방문수거 요청`);
+  const body = encodeURIComponent(
+`안녕하세요, ${c.name} 담당자님.
+
+국제 발송 물품의 방문수거(픽업)를 요청드립니다.
+
+■ 발송인: ${settings.name||"(설정에서 입력)"}
+■ 주소: ${settings.addr||"(설정에서 입력)"}
+■ 연락처: ${settings.phone||"(설정에서 입력)"}
+■ 수거 희망일: ${new Date(Date.now()+86400000).toISOString().slice(0,10)}
+
+■ 발송 물품 (${pend.length}건):
+${lines||"- (발송 대기 주문 없음)"}
+
+회신 부탁드립니다. 감사합니다.`);
+  location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+// ---------- Claude API (AI 상담사 · 번역) ----------
+async function callClaude(system, messages, maxTokens){
+  const key = settings.apiKey;
+  if(!key) throw new Error("NO_KEY");
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key": key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true"
+    },
+    body: JSON.stringify({
+      model:"claude-opus-4-8",
+      max_tokens: maxTokens||4096,
+      system, messages
+    })
+  });
+  const data = await res.json();
+  if(!res.ok){
+    const msg = data && data.error ? data.error.message : ("HTTP "+res.status);
+    if(res.status===401) throw new Error("API 키가 올바르지 않습니다. 설정 탭에서 확인하세요.");
+    if(res.status===429) throw new Error("요청 한도를 초과했습니다. 잠시 후 다시 시도하세요.");
+    if(res.status>=500) throw new Error("Anthropic 서버가 일시적으로 불안정합니다. 잠시 후 다시 시도하세요.");
+    throw new Error(msg);
+  }
+  if(data.stop_reason==="refusal") throw new Error("요청이 정책상 거절되었습니다. 내용을 바꿔 다시 시도해 보세요.");
+  return data.content.filter(b=>b.type==="text").map(b=>b.text).join("");
+}
+function apiNoticeHtml(){
+  return settings.apiKey ? "" :
+   `<div class="notice">⚠️ Claude API 키가 없습니다. <b>[설정]</b> 탭에서 API 키를 저장해야 AI 기능을 사용할 수 있습니다.
+    (<a href="https://console.anthropic.com/" target="_blank">키 발급받기</a>)</div>`;
+}
+
+// ---------- AI 상담사 ----------
+function chatSystemPrompt(){
+  const plist = products.map(p=>`- ${p.name} (${p.nameEn}): ₩${fmt(p.price)}, 무게 ${p.weight}g, 재고 ${p.stock}개`).join("\n");
+  return `당신은 한국 라이프스타일 가방 브랜드 "에카사(ECKASA)"의 해외 고객 전담 AI 상담사입니다.
+에카사는 보냉백, 토트백, 파우치, 피크닉 매트 등을 판매하는 브랜드이며 공식몰은 eckasa.com 입니다.
+
+[제품 목록]
+${plist}
+
+[상점 정책]
+${settings.policy || "(별도 정책 미입력 — 일반적인 친절한 안내를 하되, 확정할 수 없는 사항은 '판매자 확인 후 안내드리겠습니다'라고 답하세요.)"}
+
+[응답 규칙]
+1. 고객 문의가 어떤 언어로 오든, 반드시 그 고객의 언어로 정중하고 간결하게 답변하세요.
+2. 답변 뒤에 반드시 "─── 한국어 번역 ───" 구분선을 넣고, 판매자(한국인)가 이해할 수 있도록 답변 전체의 한국어 번역을 붙이세요.
+3. 가격은 원화(₩) 기준이며, 고객에게는 대략적인 현지 통화 환산도 함께 안내하면 좋습니다.
+4. 재고·배송기간 등 확실하지 않은 사항은 단정하지 말고 확인 후 안내하겠다고 답하세요.
+5. 과장·허위 안내 금지. 브랜드 이미지에 맞게 따뜻하고 프로페셔널하게.`;
+}
+function renderChat(){
+  document.getElementById("chatApiNotice").innerHTML = apiNoticeHtml();
+  const box = document.getElementById("chatBox");
+  box.innerHTML = chatHistory.length
+    ? chatHistory.map(m=>`<div class="msg ${m.role==="user"?"user":"ai"}">${esc(m.content)}</div>`).join("")
+    : `<div class="msg sys">해외 고객의 문의를 붙여넣어 보세요. 예: "Do you ship to the US? How long does it take?"</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+async function sendChat(){
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if(!text) return;
+  if(!settings.apiKey){ alert("설정 탭에서 Claude API 키를 먼저 저장하세요."); return; }
+  input.value="";
+  chatHistory.push({role:"user", content:text});
+  renderChat();
+  const box=document.getElementById("chatBox");
+  box.insertAdjacentHTML("beforeend", `<div class="msg ai" id="chatLoading"><span class="spin"></span> 답변 작성 중…</div>`);
+  box.scrollTop=box.scrollHeight;
+  document.getElementById("chatSend").disabled=true;
+  try{
+    const msgs = chatHistory.slice(-20).map(m=>({role:m.role, content:m.content}));
+    const reply = await callClaude(chatSystemPrompt(), msgs, 4096);
+    chatHistory.push({role:"assistant", content:reply});
+  }catch(err){
+    chatHistory.push({role:"assistant", content:"⚠️ 오류: "+err.message});
+  }
+  persistAll();
+  document.getElementById("chatSend").disabled=false;
+  renderChat();
+}
+function resetChat(){
+  if(confirm("상담 대화를 초기화할까요?")){ chatHistory=[]; persistAll(); renderChat(); }
+}
+document.getElementById("chatInput").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendChat(); }
+});
+
+// ---------- 번역 ----------
+async function doTranslate(){
+  const text = document.getElementById("transIn").value.trim();
+  const target = document.getElementById("transTarget").value;
+  if(!text){ alert("번역할 내용을 입력하세요."); return; }
+  if(!settings.apiKey){ alert("설정 탭에서 Claude API 키를 먼저 저장하세요."); return; }
+  const btn = document.getElementById("transBtn");
+  btn.disabled=true; btn.innerHTML=`<span class="spin"></span> 번역 중…`;
+  document.getElementById("transOut").value="";
+  try{
+    const system = `당신은 이커머스 전문 번역가입니다. 사용자가 준 텍스트를 ${target}(으)로 자연스럽고 정확하게 번역하세요.
+쇼핑몰 용어(배송, 환불, 리뷰, 재고 등)는 현지 이커머스에서 실제 쓰는 표현으로 옮기세요.
+번역 결과만 출력하고 설명은 붙이지 마세요. 원문에 HTML 태그가 있으면 태그는 유지하고 내용만 번역하세요.`;
+    const out = await callClaude(system, [{role:"user", content:text}], 8000);
+    document.getElementById("transOut").value = out.trim();
+  }catch(err){
+    document.getElementById("transOut").value = "⚠️ 오류: "+err.message;
+  }
+  btn.disabled=false; btn.textContent="번역하기";
+}
+function copyTrans(){
+  const out=document.getElementById("transOut");
+  if(!out.value) return;
+  navigator.clipboard.writeText(out.value).then(()=>alert("복사되었습니다."));
+}
+
+// ---------- 설정 ----------
+function renderSettings(){
+  document.getElementById("setApiKey").value = settings.apiKey||"";
+  document.getElementById("setName").value = settings.name||"";
+  document.getElementById("setPhone").value = settings.phone||"";
+  document.getElementById("setEmail").value = settings.email||"";
+  document.getElementById("setAddr").value = settings.addr||"";
+  document.getElementById("setPolicy").value = settings.policy||"";
+  document.getElementById("apiKeyStatus").textContent = settings.apiKey ? "✅ API 키 저장됨" : "API 키 미등록 — AI 상담사/번역 사용 불가";
+  document.getElementById("transApiNotice").innerHTML = apiNoticeHtml();
+}
+function saveApiKey(){
+  settings.apiKey = document.getElementById("setApiKey").value.trim();
+  persistAll(); renderSettings(); renderChat();
+  alert(settings.apiKey? "API 키가 저장되었습니다." : "API 키가 삭제되었습니다.");
+}
+function saveSeller(){
+  settings.name = document.getElementById("setName").value.trim();
+  settings.phone = document.getElementById("setPhone").value.trim();
+  settings.email = document.getElementById("setEmail").value.trim();
+  settings.addr = document.getElementById("setAddr").value.trim();
+  settings.policy = document.getElementById("setPolicy").value.trim();
+  persistAll();
+  document.getElementById("sellerSaved").textContent = " ✅ 저장되었습니다.";
+  setTimeout(()=>document.getElementById("sellerSaved").textContent="", 2500);
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify({products, links, orders, settings, chatHistory, exportedAt:new Date().toISOString()}, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `eckasa-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function importData(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const d = JSON.parse(reader.result);
+      if(d.products) products=d.products;
+      if(d.links) links=d.links;
+      if(d.orders) orders=d.orders;
+      if(d.settings) settings=d.settings;
+      if(d.chatHistory) chatHistory=d.chatHistory;
+      persistAll(); renderAll(); renderSettings();
+      alert("백업을 불러왔습니다.");
+    }catch(e){ alert("파일을 읽을 수 없습니다: "+e.message); }
+  };
+  reader.readAsText(file);
+  ev.target.value="";
+}
+function resetAll(){
+  if(confirm("정말 모든 데이터를 삭제할까요? (백업 권장)") && confirm("되돌릴 수 없습니다. 진행할까요?")){
+    localStorage.removeItem("eckasa_products"); localStorage.removeItem("eckasa_links");
+    localStorage.removeItem("eckasa_orders"); localStorage.removeItem("eckasa_settings");
+    localStorage.removeItem("eckasa_chat");
+    location.reload();
+  }
+}
+
+// ---------- 초기화 & 렌더 ----------
+function renderAll(){
+  renderDash(); renderLinks(); renderStock(); renderOrders(); renderShip(); renderCarriers(); renderChat();
+}
+initLinkForm(); initOrderForm(); renderSettings(); renderAll();
+</script>
+</body>
+</html>
