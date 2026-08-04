@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에카사 자동운영</title>
+<style>
+  :root{--bg:#f6f7fb;--card:#fff;--ink:#1d2433;--sub:#6b7280;--line:#e5e8f0;
+    --brand:#0f5132;--brand2:#1a7a4c;--accent:#e7f3ec;--danger:#c0392b;--warn:#b7791f;--ai:#4c3a8f;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;}
+  header{background:linear-gradient(100deg,#0f5132,#14452f);color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  header h1{font-size:19px;}
+  header .sub{font-size:12px;opacity:.9;}
+  .livepill{background:rgba(255,255,255,.15);border-radius:99px;padding:6px 14px;font-size:12px;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#69db7c;margin-right:6px;animation:pulse 1.6s infinite;}
+  @keyframes pulse{50%{opacity:.35;}}
+  nav{background:#fff;border-bottom:1px solid var(--line);padding:0 12px;display:flex;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
+  nav button{border:none;background:none;padding:13px 15px;font-size:14px;cursor:pointer;color:var(--sub);border-bottom:3px solid transparent;font-family:inherit;}
+  nav button.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:bold;}
+  main{padding:20px;max-width:1150px;margin:0 auto;}
+  .tab{display:none;}.tab.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px;}
+  .card h2{font-size:16px;margin-bottom:12px;color:var(--brand);}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{background:var(--accent);text-align:left;padding:8px 10px;font-size:12px;color:var(--brand);white-space:nowrap;}
+  td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+  .btn{display:inline-block;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit;background:var(--brand);color:#fff;}
+  .btn:hover{background:var(--brand2);}
+  .btn.sm{padding:4px 9px;font-size:12px;}
+  .btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand);}
+  .btn.gray{background:#eef0f4;color:var(--ink);}
+  .btn.red{background:var(--danger);}
+  .btn.ai{background:var(--ai);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  input,select,textarea{border:1px solid #cfd6e0;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;width:100%;}
+  label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px;}
+  .frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;}
+  .grid{display:grid;gap:14px;}
+  .grid.c4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;}
+  .stat .n{font-size:22px;font-weight:bold;color:var(--brand);margin-top:2px;}
+  .stat .l{font-size:12px;color:var(--sub);}
+  .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:bold;}
+  .b-green{background:#e3f2e5;color:#2e7d32;}.b-yellow{background:#fdf3dd;color:#b7791f;}
+  .b-red{background:#fbe4e0;color:#c0392b;}.b-gray{background:#eef0f4;color:#6b7280;}
+  .muted{color:var(--sub);font-size:12px;}
+  .logbox{height:380px;overflow-y:auto;border-radius:10px;background:#10241a;padding:12px;font-size:12.5px;font-family:Consolas,'Malgun Gothic',monospace;line-height:1.7;}
+  .lg{margin-bottom:2px;white-space:pre-wrap;}
+  .lg .t{color:#5f8f75;}
+  .lg.cycle{color:#8ce99a;font-weight:bold;}
+  .lg.tool{color:#74c0fc;}
+  .lg.think{color:#b197fc;}
+  .lg.final{color:#fff;background:#1d3b2a;padding:6px 8px;border-radius:6px;margin:6px 0;}
+  .lg.warn{color:#ffd43b;}
+  .lg.err{color:#ff8787;}
+  .alert-item{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;align-items:center;}
+  .alert-item.긴급{border-left-color:var(--danger);}
+  .pre{white-space:pre-wrap;background:#fafbfd;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12.5px;line-height:1.6;max-height:280px;overflow-y:auto;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .notice{background:#fdf3dd;border:1px solid #f0dfae;color:#7a5b12;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;}
+  @media(max-width:700px){main{padding:10px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🟢 ECKASA 자동운영</h1>
+    <div class="sub">판매 사이트를 등록해 두면 AI가 주기적으로 알아서 점검·답변·보고합니다</div>
+  </div>
+  <div class="livepill"><span class="dot"></span><span id="hdStatus">연결 중…</span></div>
+</header>
+
+<nav id="nav">
+  <button data-tab="home" class="active">🤖 자동운영</button>
+  <button data-tab="sites">🌐 판매 사이트</button>
+  <button data-tab="alerts">🔔 승인·알림함</button>
+  <button data-tab="data">📁 운영 데이터</button>
+  <button data-tab="settings">⚙️ 설정</button>
+</nav>
+
+<main>
+
+<!-- 자동운영 -->
+<div class="tab active" id="tab-home">
+  <div id="keyNotice"></div>
+  <div class="grid c4" id="homeStats"></div>
+  <div class="card" style="margin-top:16px;">
+    <div class="toolbar">
+      <h2 style="margin:0;">운영 로그 (실시간)</h2>
+      <div>
+        <button class="btn ai" id="runBtn" onclick="runNow()">▶ 지금 바로 사이클 실행</button>
+      </div>
+    </div>
+    <div class="logbox" id="logBox"></div>
+    <p class="muted" style="margin-top:8px;">사이클: 현황 파악 → 사이트 접속 점검 → 대기 문의 답변 → 재고 점검 → 발송 확인 → 리포트 저장. 서버 창을 켜 둔 동안 설정된 주기마다 자동 반복됩니다.</p>
+  </div>
+</div>
+
+<!-- 판매 사이트 -->
+<div class="tab" id="tab-sites">
+  <div class="card">
+    <h2>판매 사이트 등록</h2>
+    <p class="muted" style="margin-bottom:10px;">내 상품이 올라간 페이지(Qoo10 상점, 아마존 상품페이지, 자사몰 등)의 주소를 넣으면, AI가 매 사이클마다 실제로 접속해 상태를 점검합니다.</p>
+    <div class="frow" style="grid-template-columns:160px 1fr 130px auto;">
+      <div><label>이름</label><input id="stName" placeholder="Qoo10 내 상점"></div>
+      <div><label>URL</label><input id="stUrl" placeholder="https://..."></div>
+      <div><label>국가</label><select id="stCountry"><option value="JP">🇯🇵 일본</option><option value="CN">🇨🇳 중국</option><option value="KR">🇰🇷 한국(자사몰)</option><option value="">기타</option></select></div>
+      <div style="align-self:end;"><button class="btn" onclick="addSite()">+ 등록</button></div>
+    </div>
+    <table>
+      <thead><tr><th>이름</th><th>URL</th><th>국가</th><th>최근 점검</th><th>상태</th><th></th></tr></thead>
+      <tbody id="siteRows"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>ℹ️ 어떤 주소를 넣으면 되나요?</h2>
+    <div class="muted" style="line-height:1.9;">
+      · <b>자사몰</b>: https://eckasa.com (메인 또는 베스트 상품 페이지)<br>
+      · <b>Qoo10 재팬</b>: 내 미니샵 주소 (예: https://www.qoo10.jp/shop/상점명)<br>
+      · <b>아마존 재팬</b>: 내 상품 상세페이지 주소<br>
+      · <b>샤오홍슈 등</b>: 내 브랜드/상품 페이지 주소<br>
+      AI는 페이지의 글자를 읽고 <b>접속 가능 여부, 품절 표시, 가격 이상</b> 등을 점검해 이상하면 알림함에 등록합니다.<br>
+      ※ 로그인해야만 보이는 판매자센터 페이지(주문 목록 등)는 읽을 수 없어요. 그런 곳의 문의는 [운영 데이터] 탭에 붙여넣으면 AI가 답변을 만들어 둡니다.
+    </div>
+  </div>
+</div>
+
+<!-- 승인·알림함 -->
+<div class="tab" id="tab-alerts">
+  <div class="card">
+    <h2>🔔 사람 확인이 필요한 일</h2>
+    <p class="muted" style="margin-bottom:10px;">AI가 스스로 처리하면 안 되는 일(발주 확정, 가격 변경, 사이트 이상, 환불 승인 등)이 여기 쌓입니다. 처리하셨으면 [완료]를 누르세요.</p>
+    <div id="alertList"></div>
+  </div>
+</div>
+
+<!-- 운영 데이터 -->
+<div class="tab" id="tab-data">
+  <div class="card">
+    <h2>💬 문의 추가 (마켓에서 받은 문의 붙여넣기)</h2>
+    <div class="frow" style="grid-template-columns:120px 160px 1fr auto;">
+      <div><label>국가</label><select id="iqCountry"><option value="JP">🇯🇵 일본</option><option value="CN">🇨🇳 중국</option></select></div>
+      <div><label>보낸 사람</label><input id="iqFrom" placeholder="Qoo10 / 田中様"></div>
+      <div><label>문의 내용</label><input id="iqText" placeholder="この保冷バッグのサイズは？"></div>
+      <div style="align-self:end;"><button class="btn" onclick="addInq()">등록</button></div>
+    </div>
+    <p class="muted">등록해 두면 다음 사이클에서 AI가 자동으로 답변을 만들어 둡니다. ([▶ 지금 바로 실행]을 눌러도 됩니다)</p>
+  </div>
+  <div class="card"><h2>💬 문의함</h2><div id="inqList"></div></div>
+  <div class="card"><h2>📑 사이클 리포트</h2><div id="reportList"></div></div>
+  <div class="card"><h2>🛍️ 저장된 리스팅</h2><div id="listingList"></div></div>
+</div>
+
+<!-- 설정 -->
+<div class="tab" id="tab-settings">
+  <div class="card">
+    <h2>Claude API 키 (필수)</h2>
+    <div class="frow" style="grid-template-columns:1fr auto;">
+      <div><input type="password" id="setKey" placeholder="sk-ant-... (저장되어 있으면 'saved' 표시)"></div>
+      <div><button class="btn" onclick="saveSettings({apiKey:document.getElementById('setKey').value})">저장</button></div>
+    </div>
+    <p class="muted"><a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a>에서 발급. 키는 이 컴퓨터의 data/store.json에만 저장됩니다.</p>
+  </div>
+  <div class="card">
+    <h2>자동운영 주기</h2>
+    <div class="frow" style="grid-template-columns:180px 180px auto;">
+      <div><label>실행 간격</label><select id="setInterval">
+        <option value="30">30분마다</option><option value="60">1시간마다</option>
+        <option value="180">3시간마다</option><option value="360">6시간마다</option><option value="720">12시간마다</option>
+      </select></div>
+      <div><label>자동 실행</label><select id="setAuto"><option value="true">켜기 (자동운영)</option><option value="false">끄기 (수동만)</option></select></div>
+      <div style="align-self:end;"><button class="btn" onclick="saveSettings({intervalMin:+document.getElementById('setInterval').value, autoRun:document.getElementById('setAuto').value==='true'})">저장</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>운영 정책 (AI의 업무 기준)</h2>
+    <textarea id="setPolicy" rows="4"></textarea>
+    <button class="btn" style="margin-top:8px;" onclick="saveSettings({policy:document.getElementById('setPolicy').value})">저장</button>
+  </div>
+  <div class="card">
+    <h2>환율</h2>
+    <div class="frow" style="grid-template-columns:150px 150px auto;">
+      <div><label>1 JPY = ₩</label><input type="number" step="0.01" id="setFxJPY"></div>
+      <div><label>1 CNY = ₩</label><input type="number" step="0.1" id="setFxCNY"></div>
+      <div style="align-self:end;"><button class="btn" onclick="saveSettings({fx:{JPY:+document.getElementById('setFxJPY').value, CNY:+document.getElementById('setFxCNY').value}})">저장</button></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+"use strict";
+let STATE=null;
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmt(n){return Number(n||0).toLocaleString("ko-KR");}
+async function api(path, body){
+  const opt = body? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {};
+  const r = await fetch(path, opt);
+  return r.json();
+}
+
+document.getElementById("nav").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-tab]"); if(!b) return;
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.getElementById("tab-"+b.dataset.tab).classList.add("active");
+  if(b.dataset.tab==="data") loadData();
+});
+
+function statusBadge(s){
+  if(s==="정상") return '<span class="badge b-green">정상</span>';
+  if(s==="주의") return '<span class="badge b-yellow">주의</span>';
+  if(s==="이상") return '<span class="badge b-red">이상</span>';
+  return '<span class="badge b-gray">미점검</span>';
+}
+
+let settingsLoaded=false;
+function render(){
+  const s=STATE; if(!s) return;
+  document.getElementById("hdStatus").textContent = s.running? "사이클 실행 중…" : (s.settings.autoRun? `자동운영 ON · 다음 실행 ${s.nextRun? s.nextRun.slice(5,16):"준비 중"}` : "자동운영 OFF (수동)");
+  document.getElementById("keyNotice").innerHTML = s.settings.apiKey? "" :
+    `<div class="notice">⚠️ Claude API 키가 없습니다. <b>[설정]</b> 탭에서 저장해야 AI 자동운영이 작동합니다.</div>`;
+  document.getElementById("homeStats").innerHTML = `
+    <div class="stat"><div class="l">누적 사이클</div><div class="n">${s.cycleCount}회</div></div>
+    <div class="stat"><div class="l">등록 사이트</div><div class="n">${s.sites.length}곳</div></div>
+    <div class="stat"><div class="l">대기 문의 / 알림</div><div class="n">${s.counts.pendingInq} / <span style="color:${s.counts.alerts?'var(--danger)':'inherit'}">${s.counts.alerts}</span></div></div>
+    <div class="stat"><div class="l">마지막 실행</div><div class="n" style="font-size:15px;">${s.lastRun? s.lastRun.slice(5,16):"—"}</div></div>`;
+  // 로그
+  const box=document.getElementById("logBox");
+  const atBottom = box.scrollTop+box.clientHeight >= box.scrollHeight-40;
+  box.innerHTML = s.logs.map(l=>`<div class="lg ${esc(l.kind)}"><span class="t">${esc(l.ts)}</span> ${esc(l.text)}</div>`).join("") || '<div class="lg think">아직 로그가 없습니다. [▶ 지금 바로 사이클 실행]을 눌러보세요.</div>';
+  if(atBottom) box.scrollTop=box.scrollHeight;
+  document.getElementById("runBtn").disabled = !!s.running;
+  document.getElementById("runBtn").textContent = s.running? "실행 중…" : "▶ 지금 바로 사이클 실행";
+  // 사이트
+  document.getElementById("siteRows").innerHTML = s.sites.length? s.sites.map(x=>`<tr>
+    <td><b>${esc(x.name)}</b></td>
+    <td><a href="${esc(x.url)}" target="_blank" style="color:var(--brand);">${esc(x.url.length>44?x.url.slice(0,44)+"…":x.url)}</a></td>
+    <td>${x.country==="JP"?"🇯🇵":x.country==="CN"?"🇨🇳":x.country==="KR"?"🇰🇷":"🌐"}</td>
+    <td class="muted">${esc(x.lastCheck||"—")}<br>${esc(x.lastNote||"")}</td>
+    <td>${statusBadge(x.lastStatus)}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn sm ghost" onclick="checkSite('${x.id}')">접속 테스트</button>
+      <button class="btn sm red" onclick="delSite('${x.id}')">삭제</button>
+    </td></tr>`).join("") : `<tr><td colspan="6" class="muted">등록된 사이트가 없습니다. 위에서 판매 페이지 주소를 등록하세요.</td></tr>`;
+  // 알림
+  document.getElementById("alertList").innerHTML = STATE.alerts.length? STATE.alerts.map(a=>`
+    <div class="alert-item ${esc(a.importance)}">
+      <div><span class="badge ${a.importance==="긴급"?"b-red":a.importance==="중요"?"b-yellow":"b-gray"}">${esc(a.importance)}</span>
+      <span class="muted">${esc(a.date)}</span><br>${esc(a.message)}</div>
+      <button class="btn sm gray" onclick="doneAlert('${a.id}')">완료</button>
+    </div>`).join("") : "<p class='muted'>확인할 항목이 없습니다. 👍</p>";
+  // 설정 (최초 1회만 값 채움)
+  if(!settingsLoaded){
+    document.getElementById("setInterval").value = String(s.settings.intervalMin);
+    document.getElementById("setAuto").value = String(!!s.settings.autoRun);
+    document.getElementById("setPolicy").value = s.settings.policy;
+    document.getElementById("setFxJPY").value = s.settings.fx.JPY;
+    document.getElementById("setFxCNY").value = s.settings.fx.CNY;
+    if(s.settings.apiKey) document.getElementById("setKey").value = "saved";
+    settingsLoaded=true;
+  }
+}
+
+async function poll(){
+  try{
+    STATE = await api("/api/state");
+    render();
+    document.querySelector(".dot").style.background = "#69db7c";
+  }catch(e){
+    document.getElementById("hdStatus").textContent="서버 연결 끊김 — 서버 창을 확인하세요";
+    document.querySelector(".dot").style.background = "#ff8787";
+  }
+}
+setInterval(poll, 4000); poll();
+
+async function runNow(){ await api("/api/run", {}); setTimeout(poll, 600); }
+async function saveSettings(obj){ await api("/api/settings", obj); settingsLoaded=false; await poll(); alert("저장되었습니다."); }
+async function addSite(){
+  const name=document.getElementById("stName").value.trim();
+  const url=document.getElementById("stUrl").value.trim();
+  if(!url){ alert("URL을 입력하세요."); return; }
+  await api("/api/sites", {action:"add", name, url, country:document.getElementById("stCountry").value});
+  document.getElementById("stName").value=""; document.getElementById("stUrl").value="";
+  await poll();
+}
+async function delSite(id){ if(confirm("삭제할까요?")){ await api("/api/sites",{action:"del", id}); await poll(); } }
+async function checkSite(id){
+  const r = await api("/api/site_check", {id});
+  alert(r.ok? `접속 성공 (HTTP ${r.httpStatus})\n\n페이지 미리보기:\n${r.preview}` : `접속 실패: ${r.error}`);
+  await poll();
+}
+async function doneAlert(id){ await api("/api/alert_done",{id}); await poll(); }
+async function addInq(){
+  const text=document.getElementById("iqText").value.trim();
+  if(!text){ alert("문의 내용을 입력하세요."); return; }
+  await api("/api/inquiry", {country:document.getElementById("iqCountry").value,
+    from:document.getElementById("iqFrom").value.trim(), text});
+  document.getElementById("iqText").value=""; document.getElementById("iqFrom").value="";
+  alert("등록되었습니다. 다음 사이클에서 AI가 답변을 만듭니다.");
+  loadData();
+}
+
+async function loadData(){
+  const d = await api("/api/data");
+  document.getElementById("inqList").innerHTML = d.inquiries.length? [...d.inquiries].reverse().map(i=>`
+    <div class="card" style="margin-bottom:10px;">
+      <div class="toolbar" style="margin-bottom:6px;">
+        <div>${i.country==="JP"?"🇯🇵":"🇨🇳"} <b>${esc(i.from||"고객")}</b> <span class="muted">${esc(i.date)}</span>
+        ${i.status==="대기"?'<span class="badge b-yellow">답변 대기</span>':'<span class="badge b-green">답변 완료</span>'}</div>
+        ${i.reply? `<button class="btn sm gray" onclick="copyText(${JSON.stringify(i.reply).replace(/"/g,'&quot;')})">답변 복사</button>`:""}
+      </div>
+      <div class="pre">${esc(i.text)}</div>
+      ${i.reply? `<p style="margin:8px 0 4px;"><b>답변</b></p><div class="pre">${esc(i.reply)}</div>
+      <p style="margin:8px 0 4px;"><b>한국어</b></p><div class="pre" style="background:#f2f8f3;">${esc(i.replyKo)}</div>`:""}
+    </div>`).join("") : "<p class='muted'>문의가 없습니다.</p>";
+  document.getElementById("reportList").innerHTML = d.reports.length? [...d.reports].reverse().map(r=>`
+    <div class="card" style="margin-bottom:10px;"><b>${esc(r.title)}</b> <span class="muted">${esc(r.date)}</span>
+    <div class="pre" style="margin-top:6px;">${esc(r.content)}</div></div>`).join("") : "<p class='muted'>리포트가 없습니다.</p>";
+  document.getElementById("listingList").innerHTML = d.listings.length? d.listings.map(l=>{
+    const p = d.products.find(x=>x.id===l.productId);
+    return `<div class="card" style="margin-bottom:10px;">
+      <b>${esc(p?p.name:l.productId)}</b> ${l.country==="JP"?"🇯🇵":"🇨🇳"} <span class="badge b-gray">${esc(l.status)}</span>
+      <span class="muted">${esc(String(l.price))} ${l.country==="JP"?"JPY":"CNY"}</span>
+      <div class="pre" style="margin-top:6px;">${esc(l.title)}\n\n${esc(l.desc)}\n\n키워드: ${esc(l.keywords||"")}</div>
+      <button class="btn sm gray" style="margin-top:6px;" onclick="copyText(${JSON.stringify(l.title+"\n"+l.desc).replace(/"/g,'&quot;')})">복사</button>
+    </div>`;}).join("") : "<p class='muted'>리스팅이 없습니다.</p>";
+}
+function copyText(t){ navigator.clipboard.writeText(t).then(()=>alert("복사되었습니다.")); }
+</script>
+</body>
+</html>

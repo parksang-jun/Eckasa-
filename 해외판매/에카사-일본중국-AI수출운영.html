@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에카사 일본·중국 AI 수출운영 센터</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --ink:#1d2433; --sub:#6b7280; --line:#e5e8f0;
+    --brand:#7a2e4d; --brand2:#96455f; --accent:#f7ecf1; --danger:#c0392b; --warn:#b7791f; --ok:#2e7d32;
+    --jp:#bc002d; --cn:#de2910; --ai:#4c3a8f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background:var(--bg); color:var(--ink); font-size:14px;}
+  header{background:linear-gradient(100deg,var(--brand),#4c3a8f); color:#fff; padding:14px 24px;}
+  header h1{font-size:19px;}
+  header .sub{font-size:12px; opacity:.9;}
+  nav{background:#fff; border-bottom:1px solid var(--line); padding:0 12px; display:flex; flex-wrap:wrap; position:sticky; top:0; z-index:50;}
+  nav button{border:none; background:none; padding:13px 13px; font-size:14px; cursor:pointer; color:var(--sub); border-bottom:3px solid transparent; font-family:inherit;}
+  nav button.active{color:var(--brand); border-bottom-color:var(--brand); font-weight:bold;}
+  nav button:hover{color:var(--brand);}
+  main{padding:20px; max-width:1240px; margin:0 auto;}
+  .tab{display:none;} .tab.active{display:block;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px;}
+  .card h2{font-size:16px; margin-bottom:12px; color:var(--brand);}
+  .card h3{font-size:14px; margin:12px 0 8px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{background:var(--accent); text-align:left; padding:8px 10px; font-size:12px; color:var(--brand); white-space:nowrap;}
+  td{padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:hover td{background:#fafbfd;}
+  .btn{display:inline-block; border:none; border-radius:6px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit; background:var(--brand); color:#fff;}
+  .btn:hover{background:var(--brand2);}
+  .btn.sm{padding:4px 9px; font-size:12px;}
+  .btn.ghost{background:#fff; color:var(--brand); border:1px solid var(--brand);}
+  .btn.gray{background:#eef0f4; color:var(--ink);}
+  .btn.red{background:var(--danger);}
+  .btn.ai{background:var(--ai);}
+  .btn.ai:hover{background:#5d4aad;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  input,select,textarea{border:1px solid #cfd6e0; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; background:#fff; color:var(--ink); width:100%;}
+  label{display:block; font-size:12px; color:var(--sub); margin-bottom:4px;}
+  .frow{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:10px;}
+  .badge{display:inline-block; padding:2px 9px; border-radius:99px; font-size:11px; font-weight:bold; white-space:nowrap;}
+  .b-green{background:#e3f2e5; color:var(--ok);} .b-blue{background:#e3ecf7; color:#1a5da0;}
+  .b-yellow{background:#fdf3dd; color:var(--warn);} .b-red{background:#fbe4e0; color:var(--danger);}
+  .b-gray{background:#eef0f4; color:var(--sub);} .b-jp{background:#fde8ec; color:var(--jp);} .b-cn{background:#fdeae6; color:var(--cn);}
+  .b-ai{background:#ebe6fa; color:var(--ai);}
+  .muted{color:var(--sub); font-size:12px;}
+  .right{text-align:right;}
+  .grid{display:grid; gap:14px;}
+  .grid.c4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+  .grid.c2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .stat .n{font-size:24px; font-weight:bold; color:var(--brand); margin-top:4px;}
+  .stat .l{font-size:12px; color:var(--sub);}
+  .toolbar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+  .notice{background:#fdf3dd; border:1px solid #f0dfae; color:#7a5b12; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px;}
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(20,26,40,.5); z-index:100; overflow:auto; padding:30px 12px;}
+  .modal-bg.open{display:block;}
+  .modal{background:#fff; border-radius:12px; max-width:780px; margin:0 auto; padding:22px;}
+  .modal h2{font-size:16px; color:var(--brand); margin-bottom:14px;}
+  .modal .actions{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+  .spin{display:inline-block; width:14px; height:14px; border:2px solid #cbd5e0; border-top-color:var(--ai); border-radius:50%; animation:sp .8s linear infinite; vertical-align:-2px;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  /* AI 운영센터 */
+  .agent-wrap{display:grid; grid-template-columns:1fr 300px; gap:14px;}
+  @media(max-width:900px){ .agent-wrap{grid-template-columns:1fr;} }
+  .agent-log{height:480px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; background:#161233; padding:14px; font-size:13px;}
+  .al{margin-bottom:10px; padding:10px 12px; border-radius:9px; line-height:1.6; white-space:pre-wrap;}
+  .al.goal{background:#2d2758; color:#fff; font-weight:bold;}
+  .al.think{background:#221c46; color:#c9c2ee;}
+  .al.tool{background:#1d2c46; color:#9fd1ff; font-size:12px; font-family:Consolas,monospace;}
+  .al.result{background:#1c3a2b; color:#a8e8c2; font-size:12px;}
+  .al.final{background:#fff; color:var(--ink); border-left:4px solid var(--ai);}
+  .al.err{background:#46201c; color:#ffb4a8;}
+  .quickbtns{display:flex; flex-direction:column; gap:8px;}
+  .quickbtns button{text-align:left; padding:11px 13px; border-radius:9px; border:1px solid var(--line); background:#fff; cursor:pointer; font-family:inherit; font-size:13px;}
+  .quickbtns button:hover{border-color:var(--ai); background:#f5f2ff;}
+  .quickbtns b{color:var(--ai);}
+  .quickbtns span{display:block; color:var(--sub); font-size:11px; margin-top:2px;}
+  .listing-text{white-space:pre-wrap; background:#fafbfd; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:12.5px; line-height:1.6; max-height:200px; overflow-y:auto;}
+  .items-editor .irow{display:grid; grid-template-columns:1fr 70px 110px 34px; gap:8px; margin-bottom:6px; align-items:center;}
+  @media(max-width:700px){ main{padding:10px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ECKASA 일본 🇯🇵 · 중국 🇨🇳 AI 수출운영 센터</h1>
+  <div class="sub">AI 에이전트가 리스팅 · 문의답변 · 재고점검 · 가격책정 · 리포트까지 판매 업무를 대신 수행합니다</div>
+</header>
+
+<nav id="nav">
+  <button data-tab="agent" class="active">🤖 AI 운영센터</button>
+  <button data-tab="dash">📊 대시보드</button>
+  <button data-tab="listing">🛍️ 상품·리스팅</button>
+  <button data-tab="orders">🧾 주문</button>
+  <button data-tab="cs">💬 문의·CS</button>
+  <button data-tab="ship">🚚 배송·통관</button>
+  <button data-tab="mkt">📣 마케팅</button>
+  <button data-tab="report">📑 리포트</button>
+  <button data-tab="settings">⚙️ 설정</button>
+</nav>
+
+<main>
+
+<!-- ===== AI 운영센터 ===== -->
+<div class="tab active" id="tab-agent">
+  <div id="agentNotice"></div>
+  <div class="agent-wrap">
+    <div class="card" style="margin-bottom:0;">
+      <h2>🤖 AI 운영 에이전트</h2>
+      <p class="muted" style="margin-bottom:10px;">에이전트는 아래 도구를 직접 사용해 실제 업무를 수행합니다: 재고·주문·문의 조회, 리스팅 작성·저장, 문의 답변 저장, 주문 상태 변경, 재고 조정, 가격 계산, 마케팅 콘텐츠·리포트 저장. <b>모든 작업은 이 프로그램 안의 데이터에만 적용</b>되며, 외부(마켓·이메일)로는 아무것도 자동 전송되지 않습니다.</p>
+      <div class="agent-log" id="agentLog"><div class="al think">왼쪽 버튼을 누르거나 아래에 지시를 입력하면 에이전트가 일을 시작합니다.
+예: "신상품 토바 보냉백을 일본 Qoo10에 올릴 준비를 해줘", "대기 중인 문의 전부 답변해줘"</div></div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <input id="agentGoal" placeholder="에이전트에게 지시하기… (Enter로 실행)">
+        <button class="btn ai" id="agentRunBtn" onclick="runAgentFromInput()">실행</button>
+        <button class="btn gray" onclick="clearAgentLog()">지우기</button>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px;">
+        <h3 style="margin-top:0;">⚡ 원클릭 업무</h3>
+        <div class="quickbtns">
+          <button onclick="runAgent(PRESETS.daily)"><b>📋 오늘 업무 한번에 처리</b><span>재고·주문·문의 점검 → 필요한 조치 → 일일 리포트</span></button>
+          <button onclick="runAgent(PRESETS.inquiries)"><b>💬 대기 문의 전체 답변</b><span>일본어/중국어로 답변 작성 + 한국어 번역 저장</span></button>
+          <button onclick="runAgent(PRESETS.listings)"><b>🛍️ 리스팅 없는 상품 등록 준비</b><span>일본·중국 마켓용 상품명/설명/키워드/가격 작성</span></button>
+          <button onclick="runAgent(PRESETS.stock)"><b>📦 재고 점검·발주 제안</b><span>부족 재고 확인, 판매 속도 기반 발주량 제안</span></button>
+          <button onclick="runAgent(PRESETS.price)"><b>💰 가격 점검</b><span>환율·수수료 반영해 전 상품 적정가 재계산</span></button>
+          <button onclick="runAgent(PRESETS.marketing)"><b>📣 이번 주 마케팅 콘텐츠</b><span>일본 SNS + 중국 샤오홍슈 게시물 초안 작성</span></button>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <h3 style="margin-top:0;">에이전트가 할 수 있는 일</h3>
+        <p class="muted" style="line-height:1.8;">✅ 상품 리스팅 작성(日/中)<br>✅ 고객 문의 답변(日/中+한국어)<br>✅ 재고 확인·조정·발주 제안<br>✅ 주문 상태 관리<br>✅ 적정가 계산·조정 제안<br>✅ SNS 마케팅 콘텐츠 작성<br>✅ 일일/주간 운영 리포트<br>⛔ 외부 자동 전송(안전상 사람 승인 필요)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 대시보드 ===== -->
+<div class="tab" id="tab-dash">
+  <div class="grid c4" id="dashStats"></div>
+  <div class="grid c2" style="margin-top:16px;">
+    <div class="card"><h2>🇯🇵 일본 현황</h2><div id="dashJP"></div></div>
+    <div class="card"><h2>🇨🇳 중국 현황</h2><div id="dashCN"></div></div>
+  </div>
+  <div class="card"><h2>⚠️ 처리 필요 항목</h2><div id="dashTodo"></div></div>
+</div>
+
+<!-- ===== 상품·리스팅 ===== -->
+<div class="tab" id="tab-listing">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">상품별 마켓 리스팅</h2>
+      <div class="muted">리스팅 = 마켓에 올릴 상품명·설명·키워드·가격 세트. [AI 작성]을 누르거나 AI 운영센터에서 일괄 생성하세요.</div>
+    </div>
+    <table>
+      <thead><tr><th>제품</th><th class="right">국내가</th><th class="right">재고</th><th>🇯🇵 일본 리스팅</th><th>🇨🇳 중국 리스팅</th></tr></thead>
+      <tbody id="listingRows"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>마켓 가이드</h2>
+    <div id="marketGuideBox"></div>
+  </div>
+</div>
+
+<!-- ===== 주문 ===== -->
+<div class="tab" id="tab-orders">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">일본·중국 주문</h2>
+      <button class="btn" onclick="openOrderModal()">+ 새 주문 등록</button>
+    </div>
+    <table>
+      <thead><tr><th>주문번호</th><th>날짜</th><th>국가</th><th>마켓</th><th>고객</th><th>상품</th><th class="right">금액</th><th>결제</th><th>배송</th><th></th></tr></thead>
+      <tbody id="orderRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 문의·CS ===== -->
+<div class="tab" id="tab-cs">
+  <div class="card">
+    <h2>고객 문의 등록</h2>
+    <p class="muted" style="margin-bottom:10px;">마켓(Qoo10, 타오바오 등)에서 받은 문의를 붙여넣으면 AI가 해당 언어로 답변을 만들어 줍니다.</p>
+    <div class="frow" style="grid-template-columns:140px 160px 1fr auto;">
+      <div><label>국가</label><select id="iqCountry"><option value="JP">🇯🇵 일본</option><option value="CN">🇨🇳 중국</option></select></div>
+      <div><label>마켓/고객명</label><input id="iqFrom" placeholder="Qoo10 / 田中様"></div>
+      <div><label>문의 내용 (원문 그대로)</label><input id="iqText" placeholder="この保冷バッグのサイズを教えてください"></div>
+      <div style="align-self:end;"><button class="btn" onclick="addInquiry()">등록</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">문의함</h2>
+      <button class="btn ai sm" onclick="runAgent(PRESETS.inquiries)">🤖 대기 문의 전체 AI 답변</button>
+    </div>
+    <div id="inquiryList"></div>
+  </div>
+</div>
+
+<!-- ===== 배송·통관 ===== -->
+<div class="tab" id="tab-ship">
+  <div class="card">
+    <h2>배송 처리</h2>
+    <p class="muted" style="margin-bottom:10px;">송장번호 입력 → [추적] · [라벨] · [인보이스] 출력. 상태를 발송완료로 바꾸면 재고가 자동 차감됩니다.</p>
+    <table>
+      <thead><tr><th>주문번호</th><th>국가</th><th>고객</th><th>배송사</th><th>송장</th><th>상태</th><th></th></tr></thead>
+      <tbody id="shipRows"></tbody>
+    </table>
+  </div>
+  <div class="grid c2">
+    <div class="card">
+      <h2>🇯🇵 일본 통관·배송 가이드</h2>
+      <div class="muted" style="line-height:1.9;">
+        · <b>면세 기준</b>: 과세가격(물품가의 60%) 1만엔 이하 면세 → <b>소매가 약 16,666엔 이하</b> 주문은 대부분 면세 통관<br>
+        · 추천 배송: <b>K-Packet</b>(2kg 이하, 4~8일, 약 ₩10,000/0.5kg) 기본, 고가·급송은 <b>EMS</b>(2~4일, 약 ₩22,000/0.5kg)<br>
+        · 세관신고: 라벨의 CN22에 영문 품명 "Textile bag/pouch" + 가격 기재<br>
+        · HS코드 참고: 4202.92 (섬유제 가방류) — 정확한 코드는 관세사/우체국 확인<br>
+        · 주소는 일본어 그대로 기재 가능(국가명만 JAPAN 영문)
+      </div>
+    </div>
+    <div class="card">
+      <h2>🇨🇳 중국 통관·배송 가이드</h2>
+      <div class="muted" style="line-height:1.9;">
+        · 개인 직배송(우편): <b>행우세</b> 적용 — 가방류 세율 구간 확인 필요, 1회 1,000위안 이하 권장<br>
+        · 플랫폼(크로스보더 전자상거래) 판매: <b>종합세 약 9.1%</b>, 연간 한도(1인 26,000위안) 내<br>
+        · 추천 배송: EMS(3~7일, 통관 변수 있음) 또는 플랫폼 지정 물류/보세창고 모델<br>
+        · 필수 주의: 인기 상승 시 <b>상표(브랜드) 중국 선등록</b> — 카피·상표 선점 방지<br>
+        · 중국 주소는 중문 그대로 + 국가명 CHINA, 전화번호 필수
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 마케팅 ===== -->
+<div class="tab" id="tab-mkt">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">마케팅 콘텐츠</h2>
+      <button class="btn ai sm" onclick="runAgent(PRESETS.marketing)">🤖 이번 주 콘텐츠 AI 작성</button>
+    </div>
+    <p class="muted" style="margin-bottom:10px;">🇯🇵 일본: X(트위터)·인스타그램 게시물 / 🇨🇳 중국: 샤오홍슈(小红书) 노트가 효과적입니다. AI가 작성한 초안을 복사해 각 채널에 올리세요.</p>
+    <div id="mktList"></div>
+  </div>
+</div>
+
+<!-- ===== 리포트 ===== -->
+<div class="tab" id="tab-report">
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">운영 리포트</h2>
+      <button class="btn ai sm" onclick="runAgent(PRESETS.daily)">🤖 오늘 리포트 생성</button>
+    </div>
+    <div id="reportList"></div>
+  </div>
+</div>
+
+<!-- ===== 설정 ===== -->
+<div class="tab" id="tab-settings">
+  <div class="card">
+    <h2>Claude API 키 (AI 에이전트 필수)</h2>
+    <p class="muted" style="margin-bottom:10px;"><a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a>에서 발급. 「에카사-판매관리」 프로그램과 자동 공유됩니다.</p>
+    <div class="frow" style="grid-template-columns:1fr auto;">
+      <div><input type="password" id="setApiKey" placeholder="sk-ant-..."></div>
+      <div><button class="btn" onclick="saveApiKey()">저장</button></div>
+    </div>
+    <div id="apiKeyStatus" class="muted"></div>
+  </div>
+  <div class="card">
+    <h2>환율 (₩ 기준 — 가격 계산에 사용)</h2>
+    <div class="frow" style="grid-template-columns:180px 180px auto;">
+      <div><label>1엔(JPY) = ₩</label><input type="number" id="setFxJPY" step="0.01"></div>
+      <div><label>1위안(CNY) = ₩</label><input type="number" id="setFxCNY" step="0.1"></div>
+      <div style="align-self:end;"><button class="btn" onclick="saveFx()">저장</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>운영 정책 (AI 에이전트의 업무 기준)</h2>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>기본 마진율(%) · 배송/반품/응대 정책 등 — 에이전트가 이 기준으로 일합니다</label>
+      <textarea id="setPolicy" rows="4" placeholder="예: 기본 마진 25%. 주문 후 2영업일 내 발송. 일본은 K-Packet 기본. 반품은 수령 7일 이내, 왕복 배송비 고객 부담. 문의 답변은 정중하고 간결하게."></textarea></div>
+    </div>
+    <button class="btn" onclick="savePolicy()">저장</button><span id="policySaved" class="muted"></span>
+  </div>
+  <div class="card">
+    <h2>데이터</h2>
+    <button class="btn ghost" onclick="seedDemo()">🧪 데모 데이터 넣기 (테스트용 주문·문의)</button>
+    <button class="btn ghost" onclick="exportData()">📥 백업 저장</button>
+    <button class="btn ghost" onclick="document.getElementById('importFile').click()">📤 백업 불러오기</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    <button class="btn red" style="float:right;" onclick="resetJpCn()">이 프로그램 데이터 초기화</button>
+    <p class="muted" style="margin-top:8px;">제품·재고·주문·API키는 「에카사-판매관리」와 공유합니다. 초기화는 문의/리스팅/마케팅/리포트만 지웁니다.</p>
+  </div>
+</div>
+
+</main>
+
+<!-- 주문 모달 -->
+<div class="modal-bg" id="orderModalBg">
+  <div class="modal">
+    <h2 id="orderModalTitle">새 주문 등록</h2>
+    <input type="hidden" id="omId">
+    <div class="frow">
+      <div><label>주문일</label><input type="date" id="omDate"></div>
+      <div><label>국가</label><select id="omCountry" onchange="syncOrderCurrency()"><option value="JP">🇯🇵 일본</option><option value="CN">🇨🇳 중국</option></select></div>
+      <div><label>마켓</label><input id="omMarket" list="mkList" placeholder="Qoo10 Japan 등"><datalist id="mkList"></datalist></div>
+    </div>
+    <div class="frow">
+      <div><label>고객명</label><input id="omCustomer" placeholder="田中花子 / 王小美"></div>
+      <div><label>전화</label><input id="omPhone"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>배송 주소 (현지어 그대로)</label><input id="omAddr"></div>
+    </div>
+    <h3>주문 상품</h3>
+    <div class="items-editor" id="omItems"></div>
+    <button class="btn gray sm" onclick="addItemRow()">+ 상품 줄 추가</button>
+    <div class="frow" style="margin-top:12px;">
+      <div><label>통화</label><input id="omCurrency" readonly></div>
+      <div><label>결제 방식</label><select id="omPayMethod">
+        <option>마켓플레이스 정산</option><option>신용카드</option><option>PayPay</option><option>편의점결제</option><option>Alipay</option><option>WeChat Pay</option><option>기타</option>
+      </select></div>
+      <div><label>결제 상태</label><select id="omPayStatus"><option>결제완료</option><option>결제대기</option><option>부분환불</option><option>환불</option></select></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('orderModalBg')">취소</button>
+      <button class="btn" onclick="saveOrder()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 배송 모달 -->
+<div class="modal-bg" id="shipModalBg">
+  <div class="modal" style="max-width:520px;">
+    <h2>배송 정보</h2>
+    <input type="hidden" id="smId">
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>배송사</label><select id="smCarrier">
+        <option>우체국 K-Packet</option><option>우체국 EMS</option><option>DHL Express</option><option>FedEx</option><option>플랫폼 물류</option>
+      </select></div>
+      <div><label>송장번호</label><input id="smTracking"></div>
+      <div><label>상태</label><select id="smStatus">
+        <option>준비중</option><option>발송완료</option><option>통관중</option><option>배송중</option><option>배달완료</option><option>보류/반송</option>
+      </select></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('shipModalBg')">취소</button>
+      <button class="btn" onclick="saveShip()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 리스팅 보기/편집 모달 -->
+<div class="modal-bg" id="listingModalBg">
+  <div class="modal">
+    <h2 id="lmTitle">리스팅</h2>
+    <input type="hidden" id="lmProductId"><input type="hidden" id="lmMarketKey">
+    <div class="frow" style="grid-template-columns:1fr 160px;">
+      <div><label>상품명 (현지어)</label><input id="lmName"></div>
+      <div><label>판매가 (현지통화)</label><input type="number" id="lmPrice" step="0.01"></div>
+    </div>
+    <div class="frow" style="grid-template-columns:1fr;">
+      <div><label>상품 설명</label><textarea id="lmDesc" rows="8"></textarea></div>
+      <div><label>검색 키워드 (쉼표 구분)</label><input id="lmKeywords"></div>
+      <div><label>상태</label><select id="lmStatus"><option>초안</option><option>게시중</option><option>중지</option></select></div>
+    </div>
+    <div class="actions">
+      <button class="btn gray" onclick="closeModal('listingModalBg')">닫기</button>
+      <button class="btn ghost" onclick="copyListing()">전체 복사</button>
+      <button class="btn ai" onclick="aiWriteListing()" id="lmAiBtn">🤖 AI 작성/개선</button>
+      <button class="btn" onclick="saveListingFromModal()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================================================================
+   에카사 일본·중국 AI 수출운영 센터
+   - 제품/재고/주문/API키: 「에카사-판매관리」와 localStorage 공유
+   - AI 에이전트: Claude API tool use로 실제 업무 수행 (로컬 데이터에만)
+   ================================================================ */
+
+// ---------- 공통 ----------
+function load(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fmt(n){ return Number(n||0).toLocaleString("ko-KR"); }
+function genId(p){ return p + Date.now().toString(36).toUpperCase() + Math.floor(Math.random()*100); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+
+const SEED_PRODUCTS = [
+  {name:"싱글 보냉백", nameEn:"Single Cooler Bag", price:41000, weight:350},
+  {name:"데일리 보틀백(보냉백)", nameEn:"Daily Bottle Cooler Bag", price:38000, weight:250},
+  {name:"스팽글 토트백", nameEn:"Sequin Tote Bag", price:41000, weight:300},
+  {name:"에카사 트래블 파우치", nameEn:"Travel Pouch", price:19000, weight:120},
+  {name:"컬러 파우치", nameEn:"Color Pouch", price:15000, weight:80},
+  {name:"스트랩 파우치", nameEn:"Strap Pouch", price:19000, weight:100},
+  {name:"스퀘어 보냉백", nameEn:"Square Cooler Bag", price:45000, weight:400},
+  {name:"원형 보냉백", nameEn:"Round Cooler Bag", price:45000, weight:380},
+  {name:"토바 보냉백", nameEn:"Toba Cooler Bag", price:53000, weight:450},
+  {name:"모노백", nameEn:"Mono Bag", price:41000, weight:320},
+  {name:"토바백", nameEn:"Toba Bag", price:33000, weight:300},
+  {name:"노트북 파우치 16인치", nameEn:"Laptop Pouch 16 inch", price:39000, weight:350},
+  {name:"피크닉 매트", nameEn:"Picnic Mat", price:29000, weight:500},
+  {name:"플레이 스트랩", nameEn:"Play Strap", price:5000, weight:50},
+];
+
+// 공유 데이터 (판매관리 프로그램과 동일 키)
+let products = load("eckasa_products", null);
+if(!products){ products = SEED_PRODUCTS.map((p,i)=>({id:"P"+(i+1), ...p, stock:50, safe:10})); save("eckasa_products", products); }
+let orders = load("eckasa_orders", []);
+let settings = load("eckasa_settings", {apiKey:"", name:"", phone:"", email:"", addr:"", policy:""});
+
+// 이 프로그램 전용 데이터
+let jpcn = load("eckasa_jpcn", {
+  fx:{JPY:9.3, CNY:190},
+  policy:"기본 마진 25%. 주문 후 2영업일 내 발송. 일본은 K-Packet 기본, 고가상품 EMS. 반품은 수령 7일 이내(왕복 배송비 고객 부담), 불량은 무료 교환. 문의 답변은 정중하고 간결하게, 확실하지 않은 것은 확인 후 안내한다고 답변.",
+  inquiries:[], listings:[], marketing:[], reports:[]
+});
+function persistAll(){ save("eckasa_products",products); save("eckasa_orders",orders); save("eckasa_settings",settings); save("eckasa_jpcn",jpcn); }
+
+const MARKETS = {
+  JP: [
+    {key:"qoo10", name:"Qoo10 Japan", fee:10, lang:"일본어", tip:"한국 셀러 최다 진입 채널. 메가와리(대형 세일) 참여가 매출 핵심."},
+    {key:"amazonjp", name:"Amazon Japan", fee:15, lang:"일본어", tip:"검색 키워드 최적화 중요. FBA 이용 시 배송 경쟁력."},
+    {key:"rakuten", name:"Rakuten", fee:10, lang:"일본어", tip:"일본 최대 로컬몰. 상세페이지 정보량이 많을수록 유리."},
+  ],
+  CN: [
+    {key:"taobao", name:"타오바오/티몰 (대행)", fee:8, lang:"중국어 간체", tip:"직접 입점 장벽 높음 — 초기엔 구매대행/왕훙 유통 활용."},
+    {key:"red", name:"샤오홍슈(小红书)", fee:5, lang:"중국어 간체", tip:"콘텐츠 커머스. '노트' 형식 감성 글+사진이 판매를 만듦."},
+    {key:"douyin", name:"더우인(抖音)", fee:5, lang:"중국어 간체", tip:"라이브·쇼트폼 영상 중심."},
+  ]
+};
+const COUNTRY_INFO = {
+  JP:{name:"일본", flag:"🇯🇵", currency:"JPY", ship:"K-Packet 약 ₩10,000/0.5kg(4~8일), EMS 약 ₩22,000(2~4일)", customs:"소매가 약 16,666엔 이하 대부분 면세(과세가격 1만엔 기준)"},
+  CN:{name:"중국", flag:"🇨🇳", currency:"CNY", ship:"EMS 약 ₩18,000/0.5kg(3~7일, 통관 변수), 플랫폼 물류 권장", customs:"크로스보더 종합세 약 9.1% 또는 행우세(개인 우편)"},
+};
+const TRACK_URLS = {
+  "우체국 K-Packet":"https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=",
+  "우체국 EMS":"https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=",
+  "DHL Express":"https://www.dhl.com/kr-ko/home/tracking.html?tracking-id=",
+  "FedEx":"https://www.fedex.com/fedextrack/?trknbr=",
+};
+
+function productById(id){ return products.find(p=>p.id===id); }
+function jpcnOrders(){ return orders.filter(o=>o.country==="JP"||o.country==="CN"); }
+function orderTotal(o){ return (o.items||[]).reduce((s,it)=>s+it.qty*it.unitPrice,0); }
+function orderTotalKRW(o){ return Math.round(orderTotal(o)*(jpcn.fx[o.currency]||1)); }
+function itemsSummary(o){ return o.items.map(it=>{const p=productById(it.productId); return (p?p.name:"?")+" ×"+it.qty;}).join(", "); }
+function listingOf(pid, ckey){ return jpcn.listings.find(l=>l.productId===pid && l.country===ckey); }
+function payBadge(s){ const m={"결제완료":"b-green","결제대기":"b-yellow","부분환불":"b-red","환불":"b-red"}; return `<span class="badge ${m[s]||'b-gray'}">${esc(s)}</span>`; }
+function shipBadge(s){ const m={"준비중":"b-gray","발송완료":"b-blue","통관중":"b-yellow","배송중":"b-blue","배달완료":"b-green","보류/반송":"b-red"}; return `<span class="badge ${m[s]||'b-gray'}">${esc(s||"준비중")}</span>`; }
+function cBadge(c){ return c==="JP"?'<span class="badge b-jp">🇯🇵 일본</span>':'<span class="badge b-cn">🇨🇳 중국</span>'; }
+
+// 적정가 계산 (결정적 로직 — 에이전트 도구로도 사용)
+function calcPriceFor(pid, country, marketKey, marginPct){
+  const p = productById(pid); if(!p) return {error:"제품 없음"};
+  const market = (MARKETS[country]||[]).find(m=>m.key===marketKey) || MARKETS[country][0];
+  const margin = (marginPct!=null? marginPct : (parseFloat((jpcn.policy.match(/마진\s*(\d+)/)||[])[1])||25))/100;
+  const shipKRW = country==="JP"? (p.weight<=450? 10000: 13000) : (p.weight<=450? 18000: 22000);
+  const cost = Math.round(p.price*0.5);
+  const fee = market.fee/100, payFee = 0.03;
+  const denom = 1 - fee - payFee - margin;
+  if(denom<=0.05) return {error:"마진+수수료 과다"};
+  const fx = jpcn.fx[COUNTRY_INFO[country].currency];
+  const priceKRW = (cost+shipKRW)/denom;
+  let local = priceKRW/fx;
+  local = country==="JP" ? Math.ceil(local/100)*100-10 : Math.round(local);
+  const profit = Math.round(local*fx*(1-fee-payFee)-(cost+shipKRW));
+  return {product:p.name, market:market.name, currency:COUNTRY_INFO[country].currency,
+    recommendedPrice:local, costKRW:cost, shipKRW, feePct:market.fee, marginPct:margin*100, expectedProfitKRW:profit};
+}
+
+// ---------- 탭 ----------
+document.getElementById("nav").addEventListener("click", e=>{
+  const btn=e.target.closest("button[data-tab]"); if(!btn) return;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  renderAll();
+});
+
+// ---------- 대시보드 ----------
+function renderDash(){
+  const os = jpcnOrders();
+  const ym = today().slice(0,7);
+  const sales = os.filter(o=>o.payStatus==="결제완료"&&(o.date||"").startsWith(ym)).reduce((s,o)=>s+orderTotalKRW(o),0);
+  const pend = jpcn.inquiries.filter(i=>i.status==="대기").length;
+  const low = products.filter(p=>p.stock<=p.safe).length;
+  document.getElementById("dashStats").innerHTML = `
+    <div class="stat"><div class="l">일본+중국 주문</div><div class="n">${os.length}건</div></div>
+    <div class="stat"><div class="l">이번 달 매출(원화환산)</div><div class="n">₩${fmt(sales)}</div></div>
+    <div class="stat"><div class="l">대기 중 문의</div><div class="n" style="color:${pend?'var(--danger)':'var(--brand)'}">${pend}건</div></div>
+    <div class="stat"><div class="l">재고 부족</div><div class="n" style="color:${low?'var(--danger)':'var(--brand)'}">${low}종</div></div>`;
+  for(const c of ["JP","CN"]){
+    const co = os.filter(o=>o.country===c);
+    const el = document.getElementById("dash"+c);
+    const listed = jpcn.listings.filter(l=>l.country===c).length;
+    el.innerHTML = `<div class="muted" style="line-height:2;">
+      주문 ${co.length}건 · 매출(환산) ₩${fmt(co.reduce((s,o)=>s+orderTotalKRW(o),0))}<br>
+      리스팅 보유 ${listed}개 / 제품 ${products.length}종<br>
+      배송 진행 중 ${co.filter(o=>["발송완료","통관중","배송중"].includes(o.shipStatus)).length}건</div>`;
+  }
+  const todos=[];
+  if(pend) todos.push(`💬 답변 대기 문의 ${pend}건 → [문의·CS] 탭 또는 AI 일괄 답변`);
+  if(low) todos.push(`📦 재고 부족 ${low}종 → AI 재고 점검으로 발주 제안 받기`);
+  const noShip = jpcnOrders().filter(o=>o.payStatus==="결제완료"&&(!o.shipStatus||o.shipStatus==="준비중")).length;
+  if(noShip) todos.push(`🚚 발송 대기 주문 ${noShip}건 → [배송·통관] 탭`);
+  const noListing = products.filter(p=>!listingOf(p.id,"JP")&&!listingOf(p.id,"CN")).length;
+  if(noListing) todos.push(`🛍️ 리스팅 없는 제품 ${noListing}종 → AI 리스팅 준비`);
+  document.getElementById("dashTodo").innerHTML = todos.length? todos.map(t=>`<p style="margin:6px 0;">${t}</p>`).join(""):"<p class='muted'>지금 처리할 항목이 없습니다. 👍</p>";
+}
+
+// ---------- 리스팅 ----------
+function renderListings(){
+  document.getElementById("listingRows").innerHTML = products.map(p=>{
+    const cell = c=>{
+      const l = listingOf(p.id, c);
+      if(!l) return `<button class="btn sm ghost" onclick="openListingModal('${p.id}','${c}')">+ 만들기</button>`;
+      const st = l.status==="게시중"?"b-green":(l.status==="중지"?"b-gray":"b-yellow");
+      return `<span class="badge ${st}">${esc(l.status)}</span> <b>${esc(l.title||"")}</b> <span class="muted">${l.price?fmt(l.price)+" "+COUNTRY_INFO[c].currency:""}</span>
+        <button class="btn sm gray" onclick="openListingModal('${p.id}','${c}')">보기/수정</button>`;
+    };
+    return `<tr><td><b>${esc(p.name)}</b><br><span class="muted">${esc(p.nameEn)}</span></td>
+      <td class="right">₩${fmt(p.price)}</td><td class="right ${p.stock<=p.safe?'b-red':''}">${p.stock}</td>
+      <td>${cell("JP")}</td><td>${cell("CN")}</td></tr>`;
+  }).join("");
+  document.getElementById("marketGuideBox").innerHTML = ["JP","CN"].map(c=>
+    `<h3>${COUNTRY_INFO[c].flag} ${COUNTRY_INFO[c].name}</h3><table><thead><tr><th>마켓</th><th>수수료</th><th>공략 포인트</th></tr></thead><tbody>`+
+    MARKETS[c].map(m=>`<tr><td><b>${esc(m.name)}</b></td><td>약 ${m.fee}%</td><td class="muted">${esc(m.tip)}</td></tr>`).join("")+"</tbody></table>"
+  ).join("");
+}
+function openListingModal(pid, country){
+  const p = productById(pid); const l = listingOf(pid,country);
+  document.getElementById("lmTitle").textContent = `${COUNTRY_INFO[country].flag} ${p.name} — ${COUNTRY_INFO[country].name} 리스팅`;
+  document.getElementById("lmProductId").value=pid;
+  document.getElementById("lmMarketKey").value=country;
+  document.getElementById("lmName").value = l? l.title:"";
+  document.getElementById("lmPrice").value = l? l.price:"";
+  document.getElementById("lmDesc").value = l? l.desc:"";
+  document.getElementById("lmKeywords").value = l? l.keywords:"";
+  document.getElementById("lmStatus").value = l? l.status:"초안";
+  openModal("listingModalBg");
+}
+function saveListingData(pid, country, data){
+  let l = listingOf(pid,country);
+  if(!l){ l={id:genId("LS"), productId:pid, country, status:"초안"}; jpcn.listings.push(l); }
+  Object.assign(l, data, {updated:today()});
+  persistAll(); return l;
+}
+function saveListingFromModal(){
+  saveListingData(document.getElementById("lmProductId").value, document.getElementById("lmMarketKey").value, {
+    title:document.getElementById("lmName").value.trim(),
+    price:+document.getElementById("lmPrice").value||0,
+    desc:document.getElementById("lmDesc").value.trim(),
+    keywords:document.getElementById("lmKeywords").value.trim(),
+    status:document.getElementById("lmStatus").value,
+  });
+  closeModal("listingModalBg"); renderAll();
+}
+function copyListing(){
+  const t = `${document.getElementById("lmName").value}\n가격: ${document.getElementById("lmPrice").value}\n\n${document.getElementById("lmDesc").value}\n\n키워드: ${document.getElementById("lmKeywords").value}`;
+  navigator.clipboard.writeText(t).then(()=>alert("복사되었습니다. 마켓 판매자센터에 붙여넣으세요."));
+}
+async function aiWriteListing(){
+  const pid=document.getElementById("lmProductId").value, country=document.getElementById("lmMarketKey").value;
+  const p=productById(pid);
+  const btn=document.getElementById("lmAiBtn"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 작성 중…';
+  try{
+    const calc = calcPriceFor(pid, country, MARKETS[country][0].key, null);
+    const lang = country==="JP"?"일본어":"중국어 간체";
+    const sys = `당신은 ${COUNTRY_INFO[country].name} 이커머스 리스팅 전문가입니다. 반드시 JSON만 출력하세요.`;
+    const usr = `한국 브랜드 에카사(ECKASA)의 "${p.name}" (${p.nameEn}, 무게 ${p.weight}g, 한국판매가 ₩${fmt(p.price)})를 ${COUNTRY_INFO[country].name} 마켓(${MARKETS[country].map(m=>m.name).join(", ")})에 올릴 리스팅을 ${lang}로 작성해줘.
+권장 판매가: ${calc.recommendedPrice} ${calc.currency} (수수료·배송비·마진 반영 계산값)
+JSON 형식: {"title":"현지어 상품명(검색키워드 포함, 60자 내)","desc":"현지어 상품설명(특징·소재·사이즈 감성적으로, 인사말 포함, 15줄 내)","keywords":"검색 키워드 10개 쉼표구분","price":숫자}`;
+    const out = await callClaude(sys, [{role:"user",content:usr}], 3000);
+    const j = JSON.parse(out.replace(/^```json?\s*|\s*```$/g,""));
+    document.getElementById("lmName").value=j.title||"";
+    document.getElementById("lmDesc").value=j.desc||"";
+    document.getElementById("lmKeywords").value=j.keywords||"";
+    document.getElementById("lmPrice").value=j.price||calc.recommendedPrice;
+  }catch(e){ alert("AI 작성 실패: "+e.message); }
+  btn.disabled=false; btn.textContent="🤖 AI 작성/개선";
+}
+
+// ---------- 주문 ----------
+function itemRowHtml(item){
+  const opts = products.map(p=>`<option value="${p.id}" ${item&&item.productId===p.id?"selected":""}>${esc(p.name)}</option>`).join("");
+  return `<div class="irow"><select class="it-p">${opts}</select>
+    <input type="number" class="it-q" min="1" value="${item?item.qty:1}">
+    <input type="number" class="it-u" step="0.01" value="${item?item.unitPrice:""}" placeholder="현지 단가">
+    <button class="btn sm red" onclick="this.parentElement.remove()">×</button></div>`;
+}
+function addItemRow(item){ document.getElementById("omItems").insertAdjacentHTML("beforeend", itemRowHtml(item)); }
+function syncOrderCurrency(){ document.getElementById("omCurrency").value = COUNTRY_INFO[document.getElementById("omCountry").value].currency; }
+function openOrderModal(id){
+  const o = id? orders.find(x=>x.id===id):null;
+  document.getElementById("orderModalTitle").textContent = o? "주문 수정 — "+o.id : "새 주문 등록";
+  document.getElementById("omId").value = o?o.id:"";
+  document.getElementById("omDate").value = o?o.date:today();
+  document.getElementById("omCountry").value = o?o.country:"JP";
+  syncOrderCurrency();
+  document.getElementById("omMarket").value = o?o.market:"";
+  document.getElementById("omCustomer").value = o?o.customer:"";
+  document.getElementById("omPhone").value = o?(o.phone||""):"";
+  document.getElementById("omAddr").value = o?o.addr:"";
+  document.getElementById("omPayMethod").value = o?o.payMethod:"마켓플레이스 정산";
+  document.getElementById("omPayStatus").value = o?o.payStatus:"결제완료";
+  document.getElementById("omItems").innerHTML="";
+  if(o&&o.items.length){ o.items.forEach(it=>addItemRow(it)); } else addItemRow();
+  document.getElementById("mkList").innerHTML = [...MARKETS.JP,...MARKETS.CN].map(m=>`<option value="${esc(m.name)}">`).join("");
+  openModal("orderModalBg");
+}
+function saveOrder(){
+  const id=document.getElementById("omId").value;
+  const items=[...document.querySelectorAll("#omItems .irow")].map(r=>({
+    productId:r.querySelector(".it-p").value, qty:Math.max(1,+r.querySelector(".it-q").value||1), unitPrice:+r.querySelector(".it-u").value||0
+  })).filter(it=>it.productId);
+  if(!items.length){ alert("상품을 추가하세요."); return; }
+  const customer=document.getElementById("omCustomer").value.trim();
+  if(!customer){ alert("고객명을 입력하세요."); return; }
+  const data={ date:document.getElementById("omDate").value, country:document.getElementById("omCountry").value,
+    market:document.getElementById("omMarket").value.trim(), customer,
+    phone:document.getElementById("omPhone").value.trim(), addr:document.getElementById("omAddr").value.trim(),
+    currency:document.getElementById("omCurrency").value, payMethod:document.getElementById("omPayMethod").value,
+    payStatus:document.getElementById("omPayStatus").value, items };
+  if(id){ Object.assign(orders.find(x=>x.id===id), data); }
+  else orders.push({id:genId("EK"), ...data, shipStatus:"준비중", carrier:"", tracking:"", stockDeducted:false});
+  persistAll(); closeModal("orderModalBg"); renderAll();
+}
+function delOrder(id){ if(confirm("삭제할까요?")){ orders=orders.filter(o=>o.id!==id); persistAll(); renderAll(); } }
+function renderOrders(){
+  const list=jpcnOrders().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("orderRows").innerHTML = list.length? list.map(o=>`<tr>
+    <td style="white-space:nowrap;"><b>${esc(o.id)}</b></td><td>${esc(o.date)}</td><td>${cBadge(o.country)}</td>
+    <td>${esc(o.market)}</td><td>${esc(o.customer)}</td><td class="muted">${esc(itemsSummary(o))}</td>
+    <td class="right" style="white-space:nowrap;">${fmt(orderTotal(o))} ${esc(o.currency)}</td>
+    <td>${payBadge(o.payStatus)}</td><td>${shipBadge(o.shipStatus)}</td>
+    <td style="white-space:nowrap;"><button class="btn sm gray" onclick="openOrderModal('${o.id}')">수정</button>
+    <button class="btn sm red" onclick="delOrder('${o.id}')">삭제</button></td></tr>`).join("")
+    : `<tr><td colspan="10" class="muted">일본·중국 주문이 없습니다. 설정 탭의 [데모 데이터]로 테스트해 볼 수 있어요.</td></tr>`;
+}
+
+// ---------- 배송·통관 ----------
+function renderShip(){
+  const list=jpcnOrders().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("shipRows").innerHTML = list.length? list.map(o=>{
+    const turl = TRACK_URLS[o.carrier];
+    return `<tr><td style="white-space:nowrap;"><b>${esc(o.id)}</b></td><td>${cBadge(o.country)}</td><td>${esc(o.customer)}</td>
+    <td>${esc(o.carrier||"—")}</td><td>${esc(o.tracking||"—")}</td><td>${shipBadge(o.shipStatus)}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn sm" onclick="openShipModal('${o.id}')">배송정보</button>
+      ${o.tracking&&turl? `<a class="btn sm ghost" style="text-decoration:none;" target="_blank" href="${turl}${encodeURIComponent(o.tracking)}">추적</a>`:""}
+      <button class="btn sm ghost" onclick="printLabel('${o.id}')">라벨</button>
+      <button class="btn sm ghost" onclick="printInvoice('${o.id}')">인보이스</button>
+    </td></tr>`;}).join("") : `<tr><td colspan="7" class="muted">주문이 없습니다.</td></tr>`;
+}
+function openShipModal(id){
+  const o=orders.find(x=>x.id===id);
+  document.getElementById("smId").value=o.id;
+  document.getElementById("smCarrier").value=o.carrier||"우체국 K-Packet";
+  document.getElementById("smTracking").value=o.tracking||"";
+  document.getElementById("smStatus").value=o.shipStatus||"준비중";
+  openModal("shipModalBg");
+}
+function saveShip(){
+  const o=orders.find(x=>x.id===document.getElementById("smId").value);
+  o.carrier=document.getElementById("smCarrier").value;
+  o.tracking=document.getElementById("smTracking").value.trim();
+  const ns=document.getElementById("smStatus").value;
+  if(!o.stockDeducted && ["발송완료","통관중","배송중","배달완료"].includes(ns)){
+    o.items.forEach(it=>{const p=productById(it.productId); if(p) p.stock=Math.max(0,p.stock-it.qty);});
+    o.stockDeducted=true;
+  }
+  o.shipStatus=ns; persistAll(); closeModal("shipModalBg"); renderAll();
+}
+
+// Code39 바코드
+const CODE39={"0":"000110100","1":"100100001","2":"001100001","3":"101100000","4":"000110001","5":"100110000","6":"001110000","7":"000100101","8":"100100100","9":"001100100","A":"100001001","B":"001001001","C":"101001000","D":"000011001","E":"100011000","F":"001011000","G":"000001101","H":"100001100","I":"001001100","J":"000011100","K":"100000011","L":"001000011","M":"101000010","N":"000010011","O":"100010010","P":"001010010","Q":"000000111","R":"100000110","S":"001000110","T":"000010110","U":"110000001","V":"011000001","W":"111000000","X":"010010001","Y":"110010000","Z":"011010000","-":"010000101",".":"110000100"," ":"011000100","*":"010010100","$":"010101000","/":"010100010","+":"010001010","%":"000101010"};
+function barcodeSvg(text,height){
+  height=height||54;
+  const clean="*"+String(text).toUpperCase().replace(/[^0-9A-Z\-\. \$\/\+%]/g,"")+"*";
+  const narrow=2,wide=5,gap=2; let x=0,bars=[];
+  for(const ch of clean){ const pat=CODE39[ch]; if(!pat) continue;
+    for(let i=0;i<9;i++){ const w=pat[i]==="1"?wide:narrow;
+      if(i%2===0) bars.push(`<rect x="${x}" y="0" width="${w}" height="${height}"/>`); x+=w; } x+=gap; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${x}" height="${height+16}" viewBox="0 0 ${x} ${height+16}"><g fill="#000">${bars.join("")}</g><text x="${x/2}" y="${height+13}" font-size="11" font-family="monospace" text-anchor="middle">${esc(text)}</text></svg>`;
+}
+function printLabel(orderId){
+  const o=orders.find(x=>x.id===orderId);
+  const ci=COUNTRY_INFO[o.country];
+  const w=o.items.reduce((s,it)=>{const p=productById(it.productId);return s+(p?p.weight*it.qty:0);},0)+100;
+  const totalUSD=(orderTotalKRW(o)/1380).toFixed(2);
+  const rows=o.items.map(it=>{const p=productById(it.productId);
+    const usd=p?((p.price)/1380).toFixed(2):"0.00";
+    return `<tr><td>${esc(p?p.nameEn:"Item")} (Textile bag, HS 4202.92)</td><td class="ct">${it.qty}</td><td class="ct">${p?p.weight*it.qty:0} g</td><td class="ct">$${usd}</td></tr>`;}).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>라벨 ${esc(o.id)}</title><style>
+  body{font-family:Arial,'Malgun Gothic',sans-serif;margin:0;padding:20px;color:#000;}
+  .label{width:100mm;min-height:150mm;border:2px solid #000;padding:14px;box-sizing:border-box;}
+  .row{display:flex;justify-content:space-between;} h3{margin:0 0 4px;font-size:12px;text-transform:uppercase;}
+  .box{border:1px solid #000;padding:8px;margin-bottom:8px;font-size:13px;line-height:1.5;}
+  .to{font-size:16px;font-weight:bold;} .country{font-size:20px;font-weight:bold;}
+  table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px;} th,td{border:1px solid #000;padding:3px 5px;text-align:left;} .ct{text-align:center;}
+  .bc{text-align:center;margin:10px 0;} .small{font-size:10px;} .cn22{border:2px solid #000;padding:6px;margin-top:8px;}
+  @media print{body{padding:0;}.noprint{display:none;}}</style></head><body><div class="label">
+  <div class="row"><div style="width:48%;"><h3>From</h3><div class="box small"><b>${esc(settings.name||"ECKASA")}</b><br>${esc(settings.addr||"(설정에서 판매자 주소 입력)")}<br>Tel: ${esc(settings.phone||"-")}<br>REPUBLIC OF KOREA</div></div>
+  <div style="width:48%;"><h3>Ship To</h3><div class="box"><span class="to">${esc(o.customer)}</span><br>${esc(o.addr||"(주소 미입력)")}<br>Tel: ${esc(o.phone||"-")}<br><span class="country">${o.country==="JP"?"JAPAN":"CHINA"}</span></div></div></div>
+  <div class="bc">${barcodeSvg(o.tracking||o.id)}</div>
+  <div class="row small"><div>주문: <b>${esc(o.id)}</b> · ${esc(o.carrier||"-")}</div><div>총 무게: <b>${fmt(w)} g</b></div></div>
+  <div class="cn22"><h3>Customs Declaration CN22</h3><table><tr><th>Contents</th><th class="ct">Qty</th><th class="ct">Weight</th><th class="ct">Value</th></tr>${rows}
+  <tr><td><b>Total</b></td><td></td><td class="ct"><b>${fmt(w)} g</b></td><td class="ct"><b>$${totalUSD}</b></td></tr></table>
+  <div class="small" style="margin-top:4px;">☑ Sale of goods · Origin: <b>Republic of Korea</b><br>Date: ${today()} · Signature: ____________</div></div></div>
+  <p class="noprint" style="margin-top:14px;"><button onclick="window.print()" style="padding:10px 24px;font-size:15px;cursor:pointer;">🖨️ 인쇄</button></p></body></html>`;
+  const win=window.open("","_blank"); win.document.write(html); win.document.close();
+}
+function printInvoice(orderId){
+  const o=orders.find(x=>x.id===orderId);
+  const rows=o.items.map(it=>{const p=productById(it.productId);
+    return `<tr><td>${esc(p?p.nameEn:"Item")}</td><td class="ct">4202.92</td><td class="ct">${it.qty}</td><td class="ct">${it.unitPrice} ${o.currency}</td><td class="ct">${(it.qty*it.unitPrice).toFixed(2)} ${o.currency}</td></tr>`;}).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${esc(o.id)}</title><style>
+  body{font-family:Arial,'Malgun Gothic',sans-serif;padding:30px;color:#000;max-width:720px;margin:0 auto;}
+  h1{font-size:22px;letter-spacing:2px;} .row{display:flex;justify-content:space-between;margin:16px 0;}
+  .box{border:1px solid #000;padding:10px;width:48%;font-size:13px;line-height:1.6;}
+  table{width:100%;border-collapse:collapse;font-size:13px;} th,td{border:1px solid #000;padding:6px 8px;} .ct{text-align:center;}
+  .small{font-size:11px;color:#333;} @media print{.noprint{display:none;}}</style></head><body>
+  <h1>COMMERCIAL INVOICE</h1>
+  <div class="small">Invoice No: ${esc(o.id)} &nbsp; Date: ${esc(o.date)} &nbsp; Country of Origin: Republic of Korea &nbsp; Destination: ${o.country==="JP"?"Japan":"China"}</div>
+  <div class="row"><div class="box"><b>Shipper / Exporter</b><br>${esc(settings.name||"ECKASA")}<br>${esc(settings.addr||"")}<br>Tel: ${esc(settings.phone||"")}</div>
+  <div class="box"><b>Consignee</b><br>${esc(o.customer)}<br>${esc(o.addr||"")}<br>Tel: ${esc(o.phone||"")}</div></div>
+  <table><tr><th>Description</th><th>HS Code</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr>${rows}
+  <tr><td colspan="4" style="text-align:right;"><b>TOTAL</b></td><td class="ct"><b>${fmt(orderTotal(o))} ${o.currency}</b></td></tr></table>
+  <p class="small" style="margin-top:10px;">Terms: DAP · Reason for export: Sale of goods · I declare the above information is true and correct.<br><br>Signature: ______________________</p>
+  <p class="noprint"><button onclick="window.print()" style="padding:10px 24px;font-size:15px;cursor:pointer;">🖨️ 인쇄</button></p></body></html>`;
+  const win=window.open("","_blank"); win.document.write(html); win.document.close();
+}
+
+// ---------- 문의·CS ----------
+function addInquiry(){
+  const text=document.getElementById("iqText").value.trim();
+  if(!text){ alert("문의 내용을 입력하세요."); return; }
+  jpcn.inquiries.push({id:genId("IQ"), date:today(), country:document.getElementById("iqCountry").value,
+    from:document.getElementById("iqFrom").value.trim(), text, status:"대기", reply:"", replyKo:""});
+  document.getElementById("iqText").value=""; document.getElementById("iqFrom").value="";
+  persistAll(); renderInquiries();
+}
+function delInquiry(id){ jpcn.inquiries=jpcn.inquiries.filter(i=>i.id!==id); persistAll(); renderInquiries(); }
+function renderInquiries(){
+  const list=[...jpcn.inquiries].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("inquiryList").innerHTML = list.length? list.map(i=>`
+    <div class="card" style="margin-bottom:10px; ${i.status==="대기"?"border-color:#e8b4c0;":""}">
+      <div class="toolbar" style="margin-bottom:8px;">
+        <div>${cBadge(i.country)} <b>${esc(i.from||"고객")}</b> <span class="muted">${esc(i.date)}</span>
+          ${i.status==="대기"?'<span class="badge b-yellow">답변 대기</span>':'<span class="badge b-green">답변 완료</span>'}</div>
+        <div>
+          ${i.status==="대기"? `<button class="btn sm ai" onclick="aiAnswerOne('${i.id}', this)">🤖 AI 답변</button>`:""}
+          <button class="btn sm red" onclick="delInquiry('${i.id}')">삭제</button>
+        </div>
+      </div>
+      <div class="listing-text" style="max-height:none;">${esc(i.text)}</div>
+      ${i.reply? `<h3>답변 (${i.country==="JP"?"일본어":"중국어"}) <button class="btn sm gray" onclick="copyText('${i.id}')">복사</button></h3>
+        <div class="listing-text" id="rp-${i.id}" style="max-height:none;">${esc(i.reply)}</div>
+        <h3>한국어 번역</h3><div class="listing-text" style="max-height:none; background:#f4f8f4;">${esc(i.replyKo)}</div>`:""}
+    </div>`).join("") : "<p class='muted'>등록된 문의가 없습니다.</p>";
+}
+function copyText(id){
+  const i=jpcn.inquiries.find(x=>x.id===id);
+  navigator.clipboard.writeText(i.reply).then(()=>alert("답변이 복사되었습니다. 마켓 메시지창에 붙여넣으세요."));
+}
+async function aiAnswerOne(id, btn){
+  const i=jpcn.inquiries.find(x=>x.id===id);
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  try{
+    const sys=csSystemPrompt();
+    const usr=`${i.country==="JP"?"일본":"중국"} 고객 문의에 답변해줘. JSON만 출력: {"reply":"${i.country==="JP"?"일본어":"중국어 간체"} 답변","replyKo":"답변의 한국어 번역"}\n\n[고객: ${i.from||"미상"}]\n${i.text}`;
+    const out=await callClaude(sys,[{role:"user",content:usr}],2500);
+    const j=JSON.parse(out.replace(/^```json?\s*|\s*```$/g,""));
+    i.reply=j.reply||""; i.replyKo=j.replyKo||""; i.status="답변완료";
+    persistAll(); renderInquiries();
+  }catch(e){ alert("실패: "+e.message); btn.disabled=false; btn.textContent="🤖 AI 답변"; }
+}
+function csSystemPrompt(){
+  const plist=products.map(p=>`- ${p.name}(${p.nameEn}): ₩${fmt(p.price)}, ${p.weight}g, 재고 ${p.stock}`).join("\n");
+  return `당신은 한국 가방 브랜드 에카사(ECKASA)의 일본·중국 고객 CS 담당자입니다.
+[제품]\n${plist}\n[운영 정책]\n${jpcn.policy}\n[배송] 일본: ${COUNTRY_INFO.JP.ship} / 중국: ${COUNTRY_INFO.CN.ship}
+규칙: 고객 언어로 정중하게(일본어는 丁寧語), 짧고 명확하게. 모르는 것은 확인 후 안내하겠다고. 과장 금지.`;
+}
+
+// ---------- 마케팅 ----------
+function renderMkt(){
+  const list=[...jpcn.marketing].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("mktList").innerHTML = list.length? list.map(m=>`
+    <div class="card" style="margin-bottom:10px;">
+      <div class="toolbar" style="margin-bottom:8px;">
+        <div>${cBadge(m.country)} <b>${esc(m.channel)}</b> <span class="muted">${esc(m.date)}</span></div>
+        <div><button class="btn sm gray" onclick="copyMkt('${m.id}')">복사</button>
+        <button class="btn sm red" onclick="delMkt('${m.id}')">삭제</button></div>
+      </div>
+      <div class="listing-text" style="max-height:260px;">${esc(m.content)}</div>
+    </div>`).join("") : "<p class='muted'>콘텐츠가 없습니다. AI로 작성해 보세요.</p>";
+}
+function copyMkt(id){ const m=jpcn.marketing.find(x=>x.id===id); navigator.clipboard.writeText(m.content).then(()=>alert("복사되었습니다.")); }
+function delMkt(id){ jpcn.marketing=jpcn.marketing.filter(x=>x.id!==id); persistAll(); renderMkt(); }
+
+// ---------- 리포트 ----------
+function renderReports(){
+  const list=[...jpcn.reports].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.getElementById("reportList").innerHTML = list.length? list.map(r=>`
+    <div class="card" style="margin-bottom:10px;">
+      <div class="toolbar" style="margin-bottom:8px;"><div><b>${esc(r.title)}</b> <span class="muted">${esc(r.date)}</span></div>
+      <button class="btn sm red" onclick="delReport('${r.id}')">삭제</button></div>
+      <div class="listing-text" style="max-height:340px;">${esc(r.content)}</div>
+    </div>`).join("") : "<p class='muted'>리포트가 없습니다. AI 운영센터에서 생성하세요.</p>";
+}
+function delReport(id){ jpcn.reports=jpcn.reports.filter(x=>x.id!==id); persistAll(); renderReports(); }
+
+// ================================================================
+//  AI 에이전트 (Claude tool use)
+// ================================================================
+async function callClaude(system, messages, maxTokens, tools){
+  const key=settings.apiKey;
+  if(!key) throw new Error("NO_KEY: 설정 탭에서 Claude API 키를 저장하세요.");
+  const body={ model:"claude-opus-4-8", max_tokens:maxTokens||4096, system, messages };
+  if(tools) body.tools=tools;
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify(body)
+  });
+  const data=await res.json();
+  if(!res.ok){
+    const msg=data&&data.error?data.error.message:("HTTP "+res.status);
+    if(res.status===401) throw new Error("API 키가 올바르지 않습니다.");
+    if(res.status===429) throw new Error("요청 한도 초과 — 잠시 후 다시 시도하세요.");
+    if(res.status>=500) throw new Error("서버 일시 불안정 — 잠시 후 다시 시도하세요.");
+    throw new Error(msg);
+  }
+  if(tools) return data;
+  if(data.stop_reason==="refusal") throw new Error("요청이 거절되었습니다. 내용을 바꿔 보세요.");
+  return data.content.filter(b=>b.type==="text").map(b=>b.text).join("");
+}
+
+// --- 에이전트 도구 정의 ---
+const AGENT_TOOLS = [
+  {name:"get_overview", description:"상점 전체 현황 요약(재고부족, 대기문의, 발송대기 주문, 리스팅 없는 상품 등)을 가져온다. 업무 시작 시 가장 먼저 호출.",
+   input_schema:{type:"object",properties:{},required:[]}},
+  {name:"get_products", description:"전체 제품 목록(이름, 가격, 무게, 재고, 안전재고, 일본/중국 리스팅 유무)을 가져온다.",
+   input_schema:{type:"object",properties:{},required:[]}},
+  {name:"get_orders", description:"일본·중국 주문 목록을 가져온다.",
+   input_schema:{type:"object",properties:{status:{type:"string",description:"배송상태 필터(선택): 준비중/발송완료/통관중/배송중/배달완료"}},required:[]}},
+  {name:"get_inquiries", description:"고객 문의 목록을 가져온다.",
+   input_schema:{type:"object",properties:{only_pending:{type:"boolean",description:"true면 답변 대기만"}},required:[]}},
+  {name:"calc_price", description:"특정 제품의 특정 국가 마켓 적정 판매가를 수수료·배송비·마진 반영해 계산한다.",
+   input_schema:{type:"object",properties:{
+     productId:{type:"string"}, country:{type:"string",enum:["JP","CN"]},
+     marketKey:{type:"string",description:"qoo10/amazonjp/rakuten/taobao/red/douyin"},
+     marginPct:{type:"number",description:"마진율%(선택, 기본은 정책값)"}},required:["productId","country"]}},
+  {name:"save_listing", description:"제품의 마켓 리스팅(현지어 상품명/설명/키워드/가격)을 저장한다. 상품명·설명·키워드는 반드시 해당 국가 언어(일본어/중국어 간체)로 작성.",
+   input_schema:{type:"object",properties:{
+     productId:{type:"string"}, country:{type:"string",enum:["JP","CN"]},
+     title:{type:"string"}, desc:{type:"string"}, keywords:{type:"string"}, price:{type:"number"},
+     status:{type:"string",enum:["초안","게시중","중지"]}},required:["productId","country","title","desc","price"]}},
+  {name:"answer_inquiry", description:"고객 문의에 답변을 저장한다. reply는 고객 언어(일본어/중국어), replyKo는 한국어 번역.",
+   input_schema:{type:"object",properties:{
+     inquiryId:{type:"string"}, reply:{type:"string"}, replyKo:{type:"string"}},required:["inquiryId","reply","replyKo"]}},
+  {name:"update_order", description:"주문의 결제/배송 상태를 변경한다. 발송완료로 바꾸면 재고가 자동 차감된다.",
+   input_schema:{type:"object",properties:{
+     orderId:{type:"string"}, payStatus:{type:"string",enum:["결제대기","결제완료","부분환불","환불"]},
+     shipStatus:{type:"string",enum:["준비중","발송완료","통관중","배송중","배달완료","보류/반송"]},
+     carrier:{type:"string"}, tracking:{type:"string"}},required:["orderId"]}},
+  {name:"update_stock", description:"재고를 조정한다(입고 +, 차감 -). 반드시 사유를 함께 기록.",
+   input_schema:{type:"object",properties:{
+     productId:{type:"string"}, delta:{type:"number"}, reason:{type:"string"}},required:["productId","delta","reason"]}},
+  {name:"save_marketing", description:"마케팅 콘텐츠(SNS 게시물 초안)를 저장한다. content는 해당 국가 언어로, 한국어 번역을 함께 포함.",
+   input_schema:{type:"object",properties:{
+     country:{type:"string",enum:["JP","CN"]}, channel:{type:"string",description:"X(트위터)/Instagram/샤오홍슈/더우인 등"},
+     content:{type:"string"}},required:["country","channel","content"]}},
+  {name:"save_report", description:"운영 리포트를 저장한다. 한국어로 작성.",
+   input_schema:{type:"object",properties:{title:{type:"string"}, content:{type:"string"}},required:["title","content"]}},
+];
+
+function execTool(name, input){
+  switch(name){
+    case "get_overview": {
+      const low=products.filter(p=>p.stock<=p.safe).map(p=>({id:p.id,name:p.name,stock:p.stock,safe:p.safe}));
+      const pend=jpcn.inquiries.filter(i=>i.status==="대기").map(i=>({id:i.id,country:i.country,text:i.text.slice(0,80)}));
+      const noShip=jpcnOrders().filter(o=>o.payStatus==="결제완료"&&(!o.shipStatus||o.shipStatus==="준비중")).map(o=>({id:o.id,country:o.country,customer:o.customer}));
+      const noListing=products.filter(p=>!listingOf(p.id,"JP")||!listingOf(p.id,"CN")).map(p=>({id:p.id,name:p.name,jp:!!listingOf(p.id,"JP"),cn:!!listingOf(p.id,"CN")}));
+      const ym=today().slice(0,7);
+      const sales=jpcnOrders().filter(o=>o.payStatus==="결제완료"&&(o.date||"").startsWith(ym)).reduce((s,o)=>s+orderTotalKRW(o),0);
+      return {date:today(), monthSalesKRW:sales, totalOrders:jpcnOrders().length, lowStock:low, pendingInquiries:pend, ordersAwaitingShipment:noShip, productsMissingListings:noListing};
+    }
+    case "get_products":
+      return products.map(p=>({id:p.id,name:p.name,nameEn:p.nameEn,priceKRW:p.price,weightG:p.weight,stock:p.stock,safeStock:p.safe,
+        hasListingJP:!!listingOf(p.id,"JP"), hasListingCN:!!listingOf(p.id,"CN")}));
+    case "get_orders":
+      return jpcnOrders().filter(o=>!input.status||o.shipStatus===input.status)
+        .map(o=>({id:o.id,date:o.date,country:o.country,market:o.market,customer:o.customer,items:itemsSummary(o),
+          total:orderTotal(o)+" "+o.currency,payStatus:o.payStatus,shipStatus:o.shipStatus,carrier:o.carrier,tracking:o.tracking}));
+    case "get_inquiries":
+      return jpcn.inquiries.filter(i=>!input.only_pending||i.status==="대기")
+        .map(i=>({id:i.id,date:i.date,country:i.country,from:i.from,text:i.text,status:i.status}));
+    case "calc_price":
+      return calcPriceFor(input.productId, input.country, input.marketKey, input.marginPct);
+    case "save_listing": {
+      if(!productById(input.productId)) return {error:"productId 없음"};
+      saveListingData(input.productId, input.country, {title:input.title, desc:input.desc, keywords:input.keywords||"", price:input.price, status:input.status||"초안"});
+      return {saved:true, product:productById(input.productId).name, country:input.country};
+    }
+    case "answer_inquiry": {
+      const i=jpcn.inquiries.find(x=>x.id===input.inquiryId);
+      if(!i) return {error:"문의 없음"};
+      i.reply=input.reply; i.replyKo=input.replyKo; i.status="답변완료"; persistAll();
+      return {saved:true, inquiryId:i.id};
+    }
+    case "update_order": {
+      const o=orders.find(x=>x.id===input.orderId);
+      if(!o) return {error:"주문 없음"};
+      if(input.payStatus) o.payStatus=input.payStatus;
+      if(input.carrier) o.carrier=input.carrier;
+      if(input.tracking) o.tracking=input.tracking;
+      if(input.shipStatus){
+        if(!o.stockDeducted && ["발송완료","통관중","배송중","배달완료"].includes(input.shipStatus)){
+          o.items.forEach(it=>{const p=productById(it.productId); if(p) p.stock=Math.max(0,p.stock-it.qty);});
+          o.stockDeducted=true;
+        }
+        o.shipStatus=input.shipStatus;
+      }
+      persistAll(); return {saved:true, order:o.id, payStatus:o.payStatus, shipStatus:o.shipStatus};
+    }
+    case "update_stock": {
+      const p=productById(input.productId);
+      if(!p) return {error:"제품 없음"};
+      p.stock=Math.max(0, p.stock+Math.round(input.delta)); persistAll();
+      return {saved:true, product:p.name, newStock:p.stock, reason:input.reason};
+    }
+    case "save_marketing":
+      jpcn.marketing.push({id:genId("MK"), date:today(), country:input.country, channel:input.channel, content:input.content});
+      persistAll(); return {saved:true};
+    case "save_report":
+      jpcn.reports.push({id:genId("RP"), date:today(), title:input.title, content:input.content});
+      persistAll(); return {saved:true, title:input.title};
+    default: return {error:"알 수 없는 도구: "+name};
+  }
+}
+
+function agentSystemPrompt(){
+  return `당신은 한국 가방 브랜드 에카사(ECKASA)의 일본·중국 수출 운영을 전담하는 AI 운영 매니저입니다.
+주어진 도구로 실제 업무를 직접 수행하세요. 말로만 하지 말고 도구를 호출해서 결과를 저장해야 업무가 완료됩니다.
+
+[브랜드] 에카사 — 보냉백·토트백·파우치 라이프스타일 브랜드 (eckasa.com). 감성 디자인 + 실용성.
+[운영 정책] ${jpcn.policy}
+[시장 정보]
+- 일본: 마켓 ${MARKETS.JP.map(m=>m.name+"(수수료 약 "+m.fee+"%)").join(", ")} / 배송 ${COUNTRY_INFO.JP.ship} / 통관 ${COUNTRY_INFO.JP.customs}
+- 중국: 마켓 ${MARKETS.CN.map(m=>m.name+"(수수료 약 "+m.fee+"%)").join(", ")} / 배송 ${COUNTRY_INFO.CN.ship} / 통관 ${COUNTRY_INFO.CN.customs}
+- 환율: 1 JPY = ₩${jpcn.fx.JPY}, 1 CNY = ₩${jpcn.fx.CNY}
+
+[업무 규칙]
+1. 업무 시작 시 get_overview로 현황부터 파악.
+2. 고객에게 보이는 텍스트(리스팅·답변·마케팅)는 반드시 해당 국가 언어로: 일본=일본어(丁寧語), 중국=중국어 간체. 한국어 번역도 함께.
+3. 가격은 반드시 calc_price로 계산한 값을 기준으로. 임의로 정하지 말 것.
+4. 재고가 안전재고 이하면 발주 제안(권장 수량 포함)을 리포트에 담을 것.
+5. 확실하지 않은 정보는 지어내지 말 것.
+6. 모든 작업 완료 후, 마지막 답변에 '무엇을 했는지'를 한국어로 간단명료하게 요약할 것 (판매자가 읽는 보고).`;
+}
+
+const PRESETS = {
+  daily:"오늘 업무를 처리해줘: ①현황 파악 ②답변 대기 문의가 있으면 전부 답변 저장 ③재고 부족 상품 확인 ④발송 대기 주문 확인 ⑤오늘의 일일 운영 리포트 작성·저장(현황 요약, 처리한 일, 판매자가 직접 해야 할 일 목록 포함).",
+  inquiries:"답변 대기 중인 고객 문의를 전부 확인하고, 각각 고객 언어로 답변을 작성해서 저장해줘.",
+  listings:"일본 또는 중국 리스팅이 없는 제품을 확인하고, 그중 우선순위가 높은 제품 3개를 골라 (보냉백 우선) 없는 쪽 리스팅을 작성·저장해줘. 가격은 calc_price로 계산해서 반영하고, 완료 후 어떤 제품을 왜 골랐는지 보고해줘.",
+  stock:"전체 재고를 점검하고, 부족한 상품의 발주 제안(권장 수량과 근거)을 담은 재고 리포트를 작성·저장해줘. 재고를 임의로 조정하지는 말 것.",
+  price:"전체 제품에 대해 일본(Qoo10 기준)과 중국(샤오홍슈 기준) 적정가를 calc_price로 계산하고, 현재 리스팅 가격과 차이가 큰 상품을 찾아 가격 조정 제안 리포트를 작성·저장해줘.",
+  marketing:"이번 주 마케팅 콘텐츠를 만들어줘: 일본용 X(트위터) 게시물 1개 + Instagram 게시물 1개(일본어), 중국용 샤오홍슈 노트 1개(중국어 간체). 각각 한국어 번역 포함해서 저장하고, 어떤 제품을 소재로 했는지 보고해줘.",
+};
+
+let agentRunning=false;
+function alog(cls, text){
+  const el=document.getElementById("agentLog");
+  el.insertAdjacentHTML("beforeend", `<div class="al ${cls}">${esc(text)}</div>`);
+  el.scrollTop=el.scrollHeight;
+}
+function clearAgentLog(){ document.getElementById("agentLog").innerHTML=""; }
+function runAgentFromInput(){
+  const v=document.getElementById("agentGoal").value.trim();
+  if(v){ document.getElementById("agentGoal").value=""; runAgent(v); }
+}
+document.getElementById("agentGoal").addEventListener("keydown",e=>{ if(e.key==="Enter") runAgentFromInput(); });
+
+async function runAgent(goal){
+  if(agentRunning){ alert("에이전트가 이미 작업 중입니다."); return; }
+  if(!settings.apiKey){ alert("설정 탭에서 Claude API 키를 먼저 저장하세요."); return; }
+  agentRunning=true;
+  const btn=document.getElementById("agentRunBtn"); btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  alog("goal","🎯 "+goal);
+  const messages=[{role:"user", content:goal}];
+  const MAX_TURNS=12;
+  try{
+    for(let turn=0; turn<MAX_TURNS; turn++){
+      const resp=await callClaude(agentSystemPrompt(), messages, 4096, AGENT_TOOLS);
+      if(resp.stop_reason==="refusal"){ alog("err","요청이 거절되었습니다."); break; }
+      const textParts=resp.content.filter(b=>b.type==="text").map(b=>b.text).join("").trim();
+      const toolUses=resp.content.filter(b=>b.type==="tool_use");
+      if(resp.stop_reason!=="tool_use"){
+        if(textParts) alog("final","✅ "+textParts);
+        break;
+      }
+      if(textParts) alog("think", textParts);
+      messages.push({role:"assistant", content:resp.content});
+      const results=[];
+      for(const tu of toolUses){
+        alog("tool", `🔧 ${tu.name}(${JSON.stringify(tu.input).slice(0,140)})`);
+        let out;
+        try{ out=execTool(tu.name, tu.input||{}); }
+        catch(e){ out={error:String(e.message||e)}; }
+        const summary = out && out.error? "⚠️ "+out.error : summarizeResult(tu.name,out);
+        alog("result","→ "+summary);
+        results.push({type:"tool_result", tool_use_id:tu.id, content:JSON.stringify(out).slice(0,6000)});
+      }
+      messages.push({role:"user", content:results});
+      renderAll(); // 작업 반영 실시간 갱신
+      if(turn===MAX_TURNS-1) alog("err","최대 작업 횟수에 도달해 중단했습니다. 이어서 하려면 다시 실행하세요.");
+    }
+  }catch(e){ alog("err","⚠️ 오류: "+e.message); }
+  agentRunning=false; btn.disabled=false; btn.textContent="실행";
+  renderAll();
+}
+function summarizeResult(name,out){
+  if(out==null) return "완료";
+  if(name==="get_overview") return `현황: 재고부족 ${out.lowStock.length}종, 대기문의 ${out.pendingInquiries.length}건, 발송대기 ${out.ordersAwaitingShipment.length}건`;
+  if(name==="get_products") return `제품 ${out.length}종 조회`;
+  if(name==="get_orders") return `주문 ${out.length}건 조회`;
+  if(name==="get_inquiries") return `문의 ${out.length}건 조회`;
+  if(name==="calc_price") return out.error? out.error : `${out.product} → ${fmt(out.recommendedPrice)} ${out.currency} (예상이익 ₩${fmt(out.expectedProfitKRW)})`;
+  if(name==="save_listing") return `리스팅 저장: ${out.product} (${out.country==="JP"?"일본":"중국"})`;
+  if(name==="answer_inquiry") return `문의 답변 저장 완료`;
+  if(name==="update_order") return `주문 ${out.order} → ${out.shipStatus||out.payStatus}`;
+  if(name==="update_stock") return `${out.product} 재고 ${out.newStock}개 (${out.reason})`;
+  if(name==="save_marketing") return `마케팅 콘텐츠 저장`;
+  if(name==="save_report") return `리포트 저장: ${out.title}`;
+  return "완료";
+}
+
+// ---------- 설정 ----------
+function renderSettings(){
+  document.getElementById("setApiKey").value=settings.apiKey||"";
+  document.getElementById("apiKeyStatus").textContent=settings.apiKey?"✅ API 키 저장됨 — AI 에이전트 사용 가능":"API 키 미등록 — AI 기능 사용 불가";
+  document.getElementById("setFxJPY").value=jpcn.fx.JPY;
+  document.getElementById("setFxCNY").value=jpcn.fx.CNY;
+  document.getElementById("setPolicy").value=jpcn.policy;
+  document.getElementById("agentNotice").innerHTML = settings.apiKey? "" :
+    `<div class="notice">⚠️ AI 에이전트를 쓰려면 <b>[설정]</b> 탭에서 Claude API 키를 저장하세요. (<a href="https://console.anthropic.com/" target="_blank">키 발급</a>) — 키는 「에카사-판매관리」와 공유됩니다.</div>`;
+}
+function saveApiKey(){ settings.apiKey=document.getElementById("setApiKey").value.trim(); persistAll(); renderSettings(); alert(settings.apiKey?"저장되었습니다.":"키가 삭제되었습니다."); }
+function saveFx(){ jpcn.fx.JPY=+document.getElementById("setFxJPY").value||9.3; jpcn.fx.CNY=+document.getElementById("setFxCNY").value||190; persistAll(); alert("환율이 저장되었습니다."); }
+function savePolicy(){ jpcn.policy=document.getElementById("setPolicy").value.trim(); persistAll();
+  document.getElementById("policySaved").textContent=" ✅ 저장됨"; setTimeout(()=>document.getElementById("policySaved").textContent="",2500); }
+function seedDemo(){
+  if(!confirm("테스트용 데모 주문 2건과 문의 3건을 추가할까요?")) return;
+  orders.push(
+    {id:genId("EK"), date:today(), country:"JP", market:"Qoo10 Japan", customer:"田中花子", phone:"+81-90-1234-5678",
+     addr:"東京都渋谷区神南1-2-3 マンション101", currency:"JPY",
+     items:[{productId:"P9", qty:1, unitPrice:6490}], payMethod:"신용카드", payStatus:"결제완료", shipStatus:"준비중", carrier:"", tracking:"", stockDeducted:false},
+    {id:genId("EK"), date:today(), country:"CN", market:"샤오홍슈(小红书)", customer:"王小美", phone:"+86-138-0000-1111",
+     addr:"上海市静安区南京西路100号", currency:"CNY",
+     items:[{productId:"P4", qty:2, unitPrice:135}], payMethod:"Alipay", payStatus:"결제완료", shipStatus:"준비중", carrier:"", tracking:"", stockDeducted:false});
+  jpcn.inquiries.push(
+    {id:genId("IQ"), date:today(), country:"JP", from:"Qoo10 / 佐藤様", text:"この保冷バッグはお弁当箱が入りますか？サイズを教えてください。", status:"대기", reply:"", replyKo:""},
+    {id:genId("IQ"), date:today(), country:"JP", from:"Qoo10 / 鈴木様", text:"発送までどのくらいかかりますか？また、ギフト包装はできますか？", status:"대기", reply:"", replyKo:""},
+    {id:genId("IQ"), date:today(), country:"CN", from:"小红书 / 李娜", text:"这个包可以水洗吗？有没有其他颜色？", status:"대기", reply:"", replyKo:""});
+  persistAll(); renderAll(); alert("데모 데이터가 추가되었습니다. AI 운영센터에서 [오늘 업무 한번에 처리]를 눌러보세요!");
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify({products,orders,settings,jpcn,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`eckasa-jpcn-backup-${today()}.json`; a.click();
+}
+function importData(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{
+    const d=JSON.parse(r.result);
+    if(d.products) products=d.products; if(d.orders) orders=d.orders;
+    if(d.settings) settings=d.settings; if(d.jpcn) jpcn=d.jpcn;
+    persistAll(); renderAll(); renderSettings(); alert("불러왔습니다.");
+  }catch(e){ alert("읽기 실패: "+e.message); } };
+  r.readAsText(f); ev.target.value="";
+}
+function resetJpCn(){
+  if(confirm("문의/리스팅/마케팅/리포트 데이터를 초기화할까요? (제품·주문·설정은 유지)")){
+    jpcn.inquiries=[]; jpcn.listings=[]; jpcn.marketing=[]; jpcn.reports=[];
+    persistAll(); renderAll(); alert("초기화되었습니다.");
+  }
+}
+
+// ---------- 렌더 ----------
+function renderAll(){ renderDash(); renderListings(); renderOrders(); renderShip(); renderInquiries(); renderMkt(); renderReports(); }
+renderSettings(); renderAll();
+</script>
+</body>
+</html>
